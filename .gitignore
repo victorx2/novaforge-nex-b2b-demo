@@ -1,0 +1,22 @@
+# Backups and archives
+*.zip
+*.bak
+*.bak-*
+*.bak-original
+*.bak-theme
+
+# Internal tooling (not part of the demo)
+scripts/
+
+# Internal verification notes
+docs/VERIFICACION*
+docs/INVENTARIO*
+docs/cadenas*
+docs/extraccion*
+
+# System
+node_modules/
+.DS_Store
+Thumbs.db
+.env
+.env.*

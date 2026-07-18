@@ -1,0 +1,10 @@
+{
+  "name": "nex-industrial-portfolio-demo",
+  "version": "1.0.0",
+  "description": "Panel de Gestión NEX — maqueta anonimizada para portafolio (datos ficticios)",
+  "private": true,
+  "scripts": {
+    "start": "npx --yes serve dist -l 3000",
+    "build": "echo Usando dist preconstruida anonimizada"
+  }
+}

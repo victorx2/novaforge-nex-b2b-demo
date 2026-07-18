@@ -1,0 +1,152 @@
+/* NovaForge portfolio theme — tipografía y refinamiento */
+@import url("https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Syne:wght@500;600;700;800&display=swap");
+
+:root {
+  --nf-font-ui: "Figtree", system-ui, sans-serif;
+  --nf-font-display: "Syne", system-ui, sans-serif;
+  --nf-accent: #14b8a6;
+  --nf-accent-deep: #0f766e;
+  --nf-ink: #0f1419;
+}
+
+html {
+  font-size: 16.5px;
+}
+
+body,
+button,
+input,
+select,
+textarea,
+#root {
+  font-family: var(--nf-font-ui) !important;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Display headings: Syne, menos itálica “industrial” */
+h1,
+h2,
+h3,
+h4,
+.font-black,
+.font-extrabold,
+[class*="font-black"],
+[class*="font-extrabold"] {
+  font-family: var(--nf-font-display) !important;
+  font-style: normal !important;
+  letter-spacing: -0.02em;
+}
+
+.italic,
+[class*="italic"] {
+  font-style: normal !important;
+}
+
+/* Suavizar ALL CAPS agresivo en títulos grandes */
+h1,
+h2 {
+  text-transform: none !important;
+}
+
+/* Escala un poco más aireada */
+p,
+li,
+td,
+th,
+label,
+span {
+  line-height: 1.45;
+}
+
+/* Acento teal en focus */
+:focus-visible {
+  outline: 2px solid var(--nf-accent) !important;
+  outline-offset: 2px;
+}
+
+/* FAB / botones naranja residuales vía filtro suave si quedan clases hardcodeadas */
+.bg-orange-500,
+.bg-orange-600,
+.hover\:bg-orange-500:hover,
+.hover\:bg-orange-600:hover {
+  background-color: rgb(20 184 166) !important;
+}
+.text-orange-500,
+.text-orange-400,
+.text-orange-600 {
+  color: rgb(20 184 166) !important;
+}
+.border-orange-500,
+.border-orange-400 {
+  border-color: rgb(20 184 166) !important;
+}
+.shadow-orange-500\/20 {
+  --tw-shadow-color: rgb(20 184 166 / 0.2) !important;
+}
+.from-orange-500,
+.to-orange-600 {
+  --tw-gradient-from: #14b8a6 !important;
+  --tw-gradient-to: #0f766e !important;
+}
+
+
+/* ——— Contraste: texto blanco solo ilegible sobre fondos claros ——— */
+body {
+  color: #0f1419;
+}
+
+/* Si algún texto blanco quedó sobre tarjeta/fondo blanco */
+.bg-white .text-white,
+.bg-slate-50 .text-white,
+.bg-slate-100 .text-white,
+.bg-white .text-white\/80,
+.bg-white .text-white\/70,
+.bg-white .text-white\/60,
+.bg-white .text-white\/50 {
+  color: #0f1419 !important;
+}
+
+.bg-white .text-slate-300,
+.bg-white .text-slate-400,
+.bg-slate-50 .text-slate-300,
+.bg-slate-50 .text-slate-400 {
+  color: #475569 !important;
+}
+
+::placeholder {
+  color: #64748b !important;
+  opacity: 1;
+}
+
+/* Outline buttons sobre blanco */
+.bg-white .border-white,
+.bg-white .border-white\/10,
+.bg-white .border-white\/20 {
+  border-color: rgb(30 45 61 / 0.2) !important;
+  color: #0f1419 !important;
+}
+
+
+/* Header más limpio: logo y buscador */
+#root span.tracking-\[0\.3em\],
+#root .tracking-\[0\.3em\] {
+  letter-spacing: 0.12em !important;
+  font-size: 9px !important;
+}
+
+#root .tracking-tighter {
+  letter-spacing: -0.04em !important;
+  font-size: 1.35rem !important;
+}
+
+/* Input de búsqueda: espacio a la derecha para Docs + Ir */
+#root input[placeholder="Código, medida o marca..."],
+#root input[placeholder*="Código"] {
+  padding-right: 9.5rem !important;
+  font-size: 0.9rem !important;
+}
+
+#root .tracking-widest {
+  letter-spacing: 0.08em !important;
+}

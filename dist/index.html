@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <title>NEX Industrial — Demo Portafolio</title>
+    <style>
+      #nex-gate {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(160deg, #0f1419 0%, #1e2d3d 45%, #141b22 100%);
+        font-family: "Figtree", system-ui, sans-serif;
+        color: #f8fafc;
+      }
+      #nex-gate[hidden] {
+        display: none !important;
+      }
+      #nex-gate .card {
+        width: min(420px, 92vw);
+        padding: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(0, 21, 29, 0.85);
+        backdrop-filter: blur(8px);
+      }
+      #nex-gate h1 {
+        margin: 0 0 0.5rem;
+        font-size: 1.25rem;
+        letter-spacing: 0.04em;
+      }
+      #nex-gate p {
+        margin: 0 0 1.25rem;
+        color: #94a3b8;
+        font-size: 0.9rem;
+        line-height: 1.45;
+      }
+      #nex-gate input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 0.75rem 0.9rem;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: rgba(255, 255, 255, 0.04);
+        color: #f8fafc;
+        margin-bottom: 0.75rem;
+      }
+      #nex-gate button {
+        width: 100%;
+        padding: 0.8rem;
+        border: 0;
+        background: #14b8a6;
+        color: #0f1419;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      #nex-gate .err {
+        color: #f87171;
+        font-size: 0.85rem;
+        min-height: 1.2em;
+        margin-bottom: 0.5rem;
+      }
+      #nex-gate .note {
+        margin-top: 1rem;
+        font-size: 0.75rem;
+        color: #64748b;
+      }
+      #root[data-locked="1"] {
+        display: none !important;
+      }
+    </style>
+    <script type="module" crossorigin src="/assets/index-C7UgsiuW.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CjXhyko_.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="/assets/theme-portfolio.css" />
+  </head>
+  <body>
+    <div id="nex-gate" role="dialog" aria-modal="true" aria-labelledby="nex-gate-title">
+      <div class="card">
+        <h1 id="nex-gate-title">NEX Industrial — Demo Portafolio</h1>
+        <p>
+          Versión anonimizada para muestra de UI/UX. Datos ficticios. Acceso
+          restringido — no indexar.
+        </p>
+        <div class="err" id="nex-gate-err"></div>
+        <input
+          id="nex-gate-pass"
+          type="password"
+          placeholder="Contraseña de acceso"
+          autocomplete="current-password"
+        />
+        <button type="button" id="nex-gate-btn">Entrar</button>
+        <p class="note">
+          Contraseña por defecto: <code>portfolio-demo</code> (cámbiala antes de
+          publicar).
+        </p>
+      </div>
+    </div>
+    <div id="root" data-locked="1"></div>
+    <script>
+      (function () {
+        var KEY = "nex-portfolio-unlock";
+        var PASS = "portfolio-demo";
+        var gate = document.getElementById("nex-gate");
+        var root = document.getElementById("root");
+        var err = document.getElementById("nex-gate-err");
+        var input = document.getElementById("nex-gate-pass");
+        var btn = document.getElementById("nex-gate-btn");
+
+        function unlock() {
+          try {
+            sessionStorage.setItem(KEY, "1");
+          } catch (e) {}
+          gate.hidden = true;
+          root.removeAttribute("data-locked");
+        }
+
+        function tryUnlock() {
+          if (input.value === PASS) {
+            err.textContent = "";
+            unlock();
+          } else {
+            err.textContent = "Contraseña incorrecta.";
+          }
+        }
+
+        try {
+          if (sessionStorage.getItem(KEY) === "1") unlock();
+        } catch (e) {}
+
+        btn.addEventListener("click", tryUnlock);
+        input.addEventListener("keydown", function (e) {
+          if (e.key === "Enter") tryUnlock();
+        });
+      })();
+    </script>
+  </body>
+</html>
