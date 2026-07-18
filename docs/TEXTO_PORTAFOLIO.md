@@ -13,7 +13,8 @@ Desarrollé una maqueta B2B industrial (panel, catálogo técnico, pedidos, log�
 **Estado:** Demo de portafolio (datos ficticios)
 
 #### Qué demuestra
-- Landing / hub con buscador técnico y escaneo IA de repuestos  
+- Landing rediseñada (hero 1 columna, flujo en 4 pasos, IA abajo)  
+- Hub con buscador técnico y escaneo IA simulado  
 - Panel de usuario: pedidos, fidelización, tracking y centro fiscal B2B  
 - Catálogos: sellos, rodamientos, grasas, transmisión  
 - Sectores, pasarela de pago, planificador BOM y blog técnico  

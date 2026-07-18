@@ -132,5 +132,60 @@
         });
       })();
     </script>
+    <script>
+      (function () {
+        var FLOW_HTML =
+          '<section class="nex-flow" aria-label="Flujo de la plataforma">' +
+          '<div class="nex-flow__inner">' +
+          '<p class="nex-flow__eyebrow">Cómo se vende el flujo</p>' +
+          '<h2 class="nex-flow__title">De la pieza al despacho</h2>' +
+          '<p class="nex-flow__lead">Sección de portafolio (no existía en la maqueta original). Cuatro pasos del producto demo.</p>' +
+          '<div class="nex-flow__steps">' +
+          '<article class="nex-flow__step"><span class="nex-flow__num">01</span><h3>Identificar</h3><p>Código, medida o foto del repuesto.</p></article>' +
+          '<article class="nex-flow__step"><span class="nex-flow__num">02</span><h3>Validar ficha</h3><p>Specs técnicas y equivalencias.</p></article>' +
+          '<article class="nex-flow__step"><span class="nex-flow__num">03</span><h3>Cotizar / pagar</h3><p>Checkout B2B con datos demo.</p></article>' +
+          '<article class="nex-flow__step"><span class="nex-flow__num">04</span><h3>Mover planta</h3><p>Logística y paradas planificadas.</p></article>' +
+          "</div></div></section>";
+
+        function ensureNavMore(nav) {
+          if (!nav || nav.querySelector("#nex-nav-more")) return;
+          var more = document.createElement("button");
+          more.id = "nex-nav-more";
+          more.type = "button";
+          more.textContent = "Más";
+          more.addEventListener("click", function () {
+            nav.classList.toggle("nex-show-more");
+            more.textContent = nav.classList.contains("nex-show-more")
+              ? "Menos"
+              : "Más";
+          });
+          nav.appendChild(more);
+        }
+
+        function ensureFlow() {
+          var hero = document.querySelector(".nex-home-hero");
+          if (!hero) {
+            var old = document.querySelector(".nex-flow");
+            if (old) old.remove();
+            return;
+          }
+          if (document.querySelector(".nex-flow")) return;
+          hero.insertAdjacentHTML("afterend", FLOW_HTML);
+        }
+
+        function tick() {
+          var nav = document.querySelector("nav.fixed");
+          ensureNavMore(nav);
+          ensureFlow();
+        }
+
+        var obs = new MutationObserver(tick);
+        obs.observe(document.documentElement, {
+          childList: true,
+          subtree: true,
+        });
+        setInterval(tick, 800);
+      })();
+    </script>
   </body>
 </html>
