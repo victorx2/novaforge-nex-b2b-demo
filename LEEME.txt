@@ -8,7 +8,7 @@ PASOS:
   1. Doble clic en Iniciar_Demo.bat
      o: npm start
   2. Abrir http://localhost:3000
-  3. Contrasena: portfolio-demo
+  3. Pedir la contrasena al autor (no aparece en pantalla)
 
 NOTA: Datos ficticios. robots.txt bloquea indexacion.
 

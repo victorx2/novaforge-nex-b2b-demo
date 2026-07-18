@@ -8,7 +8,7 @@ Prototipo UI/UX de un ecosistema digital B2B industrial (catálogo técnico, pan
 1. Instala [Node.js LTS](https://nodejs.org)
 2. `npm start` o doble clic en `Iniciar_Demo.bat`
 3. Abre http://localhost:3000
-4. Contraseña: `portfolio-demo` (cámbiala en `dist/index.html` antes de publicar)
+4. Contraseña de acceso (solicitar al autor del repo; no se publica en la pantalla de login)
 
 ## Protecciones
 - Gate de acceso por contraseña

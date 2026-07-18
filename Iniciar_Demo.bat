@@ -34,7 +34,6 @@ start http://localhost:3000
 
 echo.
 echo  Listo: http://localhost:3000
-echo  Contrasena por defecto: portfolio-demo
 echo  Cierra la ventana del servidor para detenerlo.
 echo.
 pause
