@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
+import { BearingVisual } from "../components/BearingVisual";
 import { DirectoryStats } from "../components/DirectoryStats";
+import { LatestListings } from "../components/LatestListings";
 import { STATES } from "../data/states";
 import { useMarketplace } from "../lib/MarketplaceContext";
 import { searchMarketplace } from "../lib/marketplace";
@@ -91,11 +93,29 @@ export function Buscar() {
 
       <DirectoryStats />
 
+      {!submitted && (
+        <LatestListings
+          onPickCode={(code, state) => runSearch(code, state ?? "")}
+        />
+      )}
+
       {submitted && (
         <p className="results-meta">
           {results.length} resultado{results.length === 1 ? "" : "s"} para{" "}
           <strong>{submitted}</strong>
           {submittedState ? ` · ${submittedState}` : " · nacional"}
+          {" · "}
+          <button
+            type="button"
+            className="linkish"
+            onClick={() => {
+              setSubmitted("");
+              setSubmittedState("");
+              setQuery("");
+            }}
+          >
+            Ver últimos listados
+          </button>
         </p>
       )}
 
@@ -111,24 +131,30 @@ export function Buscar() {
         <div className="hits-grid">
           {results.map((hit, i) => (
             <article
-              className="hit-card"
+              className="hit-card hit-card-media"
               key={`${hit.dealer.id}-${hit.listing.part_number}-${hit.listing.brand}-${hit.listing.observation}-${i}`}
             >
-              <div className="hit-code">{hit.listing.part_number}</div>
-              <div className="hit-name">{hit.listing.name}</div>
-              <div className="hit-meta">
-                <span>{hit.listing.brand}</span>
-                {hit.listing.model && <span>· {hit.listing.model}</span>}
+              <BearingVisual
+                partNumber={hit.listing.part_number}
+                brand={hit.listing.brand}
+              />
+              <div className="hit-body">
+                <div className="hit-code">{hit.listing.part_number}</div>
+                <div className="hit-name">{hit.listing.name}</div>
+                <div className="hit-meta">
+                  <span>{hit.listing.brand}</span>
+                  {hit.listing.model && <span>· {hit.listing.model}</span>}
+                </div>
+                <div className="hit-obs">{hit.listing.observation}</div>
+                <div className="hit-place">
+                  <strong>{hit.dealer.state}</strong> · {hit.dealer.city}
+                </div>
+                <div className="hit-address">{hit.dealer.address}</div>
+                <a className="hit-phone" href={`tel:${hit.dealer.phone}`}>
+                  {hit.dealer.phone}
+                </a>
+                <div className="hit-biz">{hit.dealer.businessName}</div>
               </div>
-              <div className="hit-obs">{hit.listing.observation}</div>
-              <div className="hit-place">
-                <strong>{hit.dealer.state}</strong> · {hit.dealer.city}
-              </div>
-              <div className="hit-address">{hit.dealer.address}</div>
-              <a className="hit-phone" href={`tel:${hit.dealer.phone}`}>
-                {hit.dealer.phone}
-              </a>
-              <div className="hit-biz">{hit.dealer.businessName}</div>
             </article>
           ))}
         </div>

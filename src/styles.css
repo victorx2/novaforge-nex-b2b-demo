@@ -294,6 +294,152 @@ select {
   gap: 0.25rem;
 }
 
+.hit-card-media {
+  padding: 0.75rem;
+  gap: 0.65rem;
+}
+
+.hit-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.bearing-visual {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  aspect-ratio: 1.35 / 1;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+}
+
+.bearing-svg {
+  width: 72%;
+  max-width: 140px;
+  height: auto;
+}
+
+.bv-outer {
+  fill: #d8e2e8;
+  stroke: #9aadb8;
+}
+
+.bv-mid {
+  fill: #eef3f6;
+  stroke: #b7c5cf;
+}
+
+.bv-inner {
+  fill: #c5d0d8;
+  stroke: #8fa0ad;
+}
+
+.bv-ball {
+  fill: #f7fafb;
+  stroke: #7a8c99;
+  stroke-width: 1.2;
+}
+
+.bv-seal {
+  stroke: #0e7c6b;
+  opacity: 0.55;
+}
+
+.bv-shield {
+  stroke: #5c7383;
+  opacity: 0.5;
+  stroke-dasharray: 4 3;
+}
+
+.tone-0 {
+  background: linear-gradient(160deg, #e8f4f1, #f4f7f9);
+}
+.tone-1 {
+  background: linear-gradient(160deg, #e8eef8, #f5f7fb);
+}
+.tone-2 {
+  background: linear-gradient(160deg, #f3efe8, #faf8f4);
+}
+.tone-3 {
+  background: linear-gradient(160deg, #ece8f4, #f7f5fb);
+}
+.tone-4 {
+  background: linear-gradient(160deg, #e8f1f4, #f4f9fb);
+}
+
+.brand-badge {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.45rem;
+  background: rgba(26, 43, 54, 0.88);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.22rem 0.4rem;
+  border-radius: 5px;
+}
+
+.latest-section {
+  margin: 0.25rem 0 1.75rem;
+}
+
+.latest-head {
+  margin-bottom: 0.85rem;
+}
+
+.latest-head h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1.25rem;
+}
+
+.latest-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.latest-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.85rem;
+}
+
+.latest-card {
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.65rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  color: inherit;
+  font: inherit;
+}
+
+.latest-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 6px 20px rgba(26, 43, 54, 0.06);
+}
+
+.latest-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0 0.15rem 0.25rem;
+}
+
+.latest-name {
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
 .hit-code {
   font-weight: 700;
   color: var(--accent);
