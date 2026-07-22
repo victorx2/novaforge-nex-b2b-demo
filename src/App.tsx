@@ -1,48 +1,64 @@
 import { useState } from "react";
 import { PasswordGate } from "./components/PasswordGate";
-import { InventoryProvider } from "./lib/InventoryContext";
+import { MarketplaceProvider } from "./lib/MarketplaceContext";
 import { Buscar } from "./pages/Buscar";
-import { MiStock } from "./pages/MiStock";
+import { Repuestero } from "./pages/Repuestero";
 
-type Page = "buscar" | "stock";
+type Page = "buscar" | "repuestero";
 
-export default function App() {
+function Shell() {
   const [page, setPage] = useState<Page>("buscar");
 
   return (
-    <PasswordGate>
-      <InventoryProvider>
-        <div className="app">
-          <header className="topbar">
-            <div className="brand">
-              <span className="brand-mark">NEX</span>
-              <span className="brand-sub">Fase A · Buscar + Stock</span>
+    <div className="app">
+      <header className="site-header">
+        <div className="site-header-inner">
+          <div className="brand-block">
+            <div className="brand-logo" aria-hidden>
+              <span>B</span>
             </div>
-            <nav className="nav">
-              <button
-                type="button"
-                className={page === "buscar" ? "nav-btn active" : "nav-btn"}
-                onClick={() => setPage("buscar")}
-              >
-                Buscar
-              </button>
-              <button
-                type="button"
-                className={page === "stock" ? "nav-btn active" : "nav-btn"}
-                onClick={() => setPage("stock")}
-              >
-                Mi stock
-              </button>
-            </nav>
-            <a className="portfolio-link" href="/portfolio/" title="Maqueta ecosistema completa">
-              Portafolio
-            </a>
-          </header>
-          <main className="main">
-            {page === "buscar" ? <Buscar /> : <MiStock />}
-          </main>
+            <div className="brand-text">
+              <div className="brand-name">BuscaRepuesto</div>
+              <div className="brand-tagline">
+                Encuentra la pieza · llama al local
+              </div>
+            </div>
+          </div>
         </div>
-      </InventoryProvider>
+      </header>
+
+      <nav className="tabs" aria-label="Secciones">
+        <div className="tabs-inner">
+          <button
+            type="button"
+            className={page === "buscar" ? "tab active" : "tab"}
+            onClick={() => setPage("buscar")}
+          >
+            Buscar
+          </button>
+          <button
+            type="button"
+            className={page === "repuestero" ? "tab active" : "tab"}
+            onClick={() => setPage("repuestero")}
+          >
+            Soy repuestero
+          </button>
+        </div>
+      </nav>
+
+      <main className="main">
+        {page === "buscar" ? <Buscar /> : <Repuestero />}
+      </main>
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <PasswordGate>
+      <MarketplaceProvider>
+        <Shell />
+      </MarketplaceProvider>
     </PasswordGate>
   );
 }

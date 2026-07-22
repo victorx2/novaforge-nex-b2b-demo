@@ -1,43 +1,32 @@
-# NovaForge NEX — Fase A (demo cliente)
+# BuscaRepuesto — demo multi-local
 
-Demo mínima para el perfil **repuestero**: **Buscar** + **Mi stock**.
+Directorio tipo Víctor: el cliente busca un código y ve **dónde lo venden** (estado, dirección, teléfono). El repuestero se registra gratis y carga su lista. Sin precios en pantalla.
 
-> Pon el código. Si está, te dice cuántos y dónde.
-
-La maqueta de ecosistema completa (Industria, Catálogo, Planta, Cuenta, etc.) quedó archivada en **`/portfolio/`**.
+> Busca la pieza. Llama al local. El precio lo cuadran ustedes.
 
 ## Demo local
 
 1. Instala [Node.js LTS](https://nodejs.org)
 2. `npm install`
-3. `npm start` (sirve `dist/`) o doble clic en `Iniciar_Demo.bat` (build + servir)
-4. Abre http://localhost:3000
-5. Contraseña de acceso (solicitar al autor del repo; no se publica en la pantalla de login)
+3. `npm start` o `Iniciar_Demo.bat`
+4. http://localhost:3000 — contraseña de acceso: pedir al autor del repo
 
-Portafolio UI/UX completo: http://localhost:3000/portfolio/
+Portafolio UI antiguo (solo URL): http://localhost:3000/portfolio/
+
+## Qué incluye
+
+| Pantalla | Función |
+|----------|---------|
+| **Buscar** | Código / medida + filtro por estado → cuadrícula de locales (teléfono, dirección). Sin precio. |
+| **Soy repuestero** | Registro gratis, editar local, subir CSV (`codigo,nombre,marca,modelo,observacion`) |
+
+Seed: 6 locales demo en Carabobo, Aragua, Caracas, Zulia, Bolívar, Lara. Prueba `6205`. Login seed: `0412-5550101` / PIN `1234`.
+
+Datos en `localStorage` (demo sin backend). Siguiente paso real: base de datos en la nube.
 
 ## Desarrollo
 
 ```bash
-npm run dev      # Vite hot reload
-npm run build    # genera dist/ + copia portfolio-demo → dist/portfolio
+npm run dev
+npm run build
 ```
-
-## Qué incluye Fase A
-
-| Pantalla | Función |
-|----------|---------|
-| **Buscar** | Código, medida `25x52x15` o marca → cantidad + ubicación |
-| **Mi stock** | Tabla, editar cantidad, importar CSV, plantilla, restaurar seed |
-
-Sin backend: inventario en `localStorage`. Seed de rodamientos demo incluido.
-
-## Protecciones
-
-- Gate por contraseña (sessionStorage)
-- `robots.txt` → `Disallow: /`
-- Meta / header `noindex, nofollow`
-
-## Aviso
-
-Datos ficticios. No incluye inventario de ninguna empresa real.

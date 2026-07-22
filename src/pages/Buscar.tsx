@@ -1,77 +1,133 @@
 import { useMemo, useState } from "react";
-import { useInventory } from "../lib/InventoryContext";
-import { searchInventory } from "../lib/inventory";
+import { STATES } from "../data/states";
+import { useMarketplace } from "../lib/MarketplaceContext";
+import { searchMarketplace } from "../lib/marketplace";
 
 export function Buscar() {
-  const { items } = useInventory();
+  const { dealers } = useMarketplace();
   const [query, setQuery] = useState("");
+  const [stateFilter, setStateFilter] = useState("");
   const [submitted, setSubmitted] = useState("");
+  const [submittedState, setSubmittedState] = useState("");
 
   const results = useMemo(
-    () => (submitted ? searchInventory(items, submitted) : []),
-    [items, submitted],
+    () =>
+      submitted
+        ? searchMarketplace(dealers, submitted, submittedState)
+        : [],
+    [dealers, submitted, submittedState],
   );
 
+  function runSearch(q: string, state: string) {
+    setQuery(q);
+    setStateFilter(state);
+    setSubmitted(q.trim());
+    setSubmittedState(state);
+  }
+
   return (
-    <section className="panel">
-      <header className="panel-head">
-        <h2>Buscar</h2>
-        <p>Pon el código. Si está, te dice cuántos y dónde.</p>
-      </header>
+    <section className="search-page">
+      <div className="search-hero">
+        <h1>¿Qué pieza buscas?</h1>
+        <p>
+          Escribe el código. Te mostramos en qué locales la tienen — con
+          teléfono y dirección. El precio lo cuadran ustedes.
+        </p>
 
-      <form
-        className="search-row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          setSubmitted(query.trim());
-        }}
-      >
-        <input
-          className="search-input"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Ej. 6205, 6205-2RS o 25x52x15"
-          autoFocus
-        />
-        <button type="submit" className="btn-primary">
-          Buscar
-        </button>
-      </form>
+        <form
+          className="search-form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            runSearch(query, stateFilter);
+          }}
+        >
+          <input
+            className="search-input"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Ej. 6205-2RS o 25x52x15"
+            autoFocus
+          />
+          <select
+            className="state-select"
+            value={stateFilter}
+            onChange={(e) => setStateFilter(e.target.value)}
+            aria-label="Filtrar por estado"
+          >
+            <option value="">Todo el país</option>
+            {STATES.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+          <button type="submit" className="btn-primary">
+            Buscar
+          </button>
+        </form>
 
-      {!submitted && (
-        <p className="hint">Prueba: <button type="button" className="linkish" onClick={() => { setQuery("6205"); setSubmitted("6205"); }}>6205</button> o <button type="button" className="linkish" onClick={() => { setQuery("25x52x15"); setSubmitted("25x52x15"); }}>25x52x15</button></p>
+        {!submitted && (
+          <p className="hint">
+            Prueba:{" "}
+            <button
+              type="button"
+              className="linkish"
+              onClick={() => runSearch("6205", "")}
+            >
+              6205
+            </button>{" "}
+            en todo el país, o{" "}
+            <button
+              type="button"
+              className="linkish"
+              onClick={() => runSearch("6205", "Carabobo")}
+            >
+              6205 en Carabobo
+            </button>
+          </p>
+        )}
+      </div>
+
+      {submitted && (
+        <p className="results-meta">
+          {results.length} resultado{results.length === 1 ? "" : "s"} para{" "}
+          <strong>{submitted}</strong>
+          {submittedState ? ` · ${submittedState}` : " · nacional"}
+        </p>
       )}
 
       {submitted && results.length === 0 && (
         <div className="empty">
-          No hay coincidencias para <strong>{submitted}</strong>.
+          Nadie tiene listado <strong>{submitted}</strong>
+          {submittedState ? ` en ${submittedState}` : ""}. Prueba otro estado o
+          código.
         </div>
       )}
 
       {results.length > 0 && (
-        <div className="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Código</th>
-                <th>Descripción</th>
-                <th>Marca</th>
-                <th>Cant.</th>
-                <th>Ubicación</th>
-              </tr>
-            </thead>
-            <tbody>
-              {results.map((item) => (
-                <tr key={item.part_number}>
-                  <td className="code">{item.part_number}</td>
-                  <td>{item.description}</td>
-                  <td>{item.brand}</td>
-                  <td className={item.qty <= 0 ? "qty-zero" : "qty"}>{item.qty}</td>
-                  <td>{item.location}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="hits-grid">
+          {results.map((hit, i) => (
+            <article
+              className="hit-card"
+              key={`${hit.dealer.id}-${hit.listing.part_number}-${hit.listing.brand}-${hit.listing.observation}-${i}`}
+            >
+              <div className="hit-code">{hit.listing.part_number}</div>
+              <div className="hit-name">{hit.listing.name}</div>
+              <div className="hit-meta">
+                <span>{hit.listing.brand}</span>
+                {hit.listing.model && <span>· {hit.listing.model}</span>}
+              </div>
+              <div className="hit-obs">{hit.listing.observation}</div>
+              <div className="hit-place">
+                <strong>{hit.dealer.state}</strong> · {hit.dealer.city}
+              </div>
+              <div className="hit-address">{hit.dealer.address}</div>
+              <a className="hit-phone" href={`tel:${hit.dealer.phone}`}>
+                {hit.dealer.phone}
+              </a>
+              <div className="hit-biz">{hit.dealer.businessName}</div>
+            </article>
+          ))}
         </div>
       )}
     </section>

@@ -1,7 +1,7 @@
 {
   "name": "nex-fase-a",
   "version": "1.0.0",
-  "description": "NEX Fase A — Buscar + Mi stock (demo cliente). Portafolio completo en /portfolio.",
+  "description": "BuscaRepuesto — directorio multi-local: busca pieza, llama al repuestero.",
   "private": true,
   "type": "module",
   "scripts": {
