@@ -1,32 +1,46 @@
-# BuscaRepuesto — demo multi-local
+# BuscaRepuesto (programa real)
 
-Directorio tipo Víctor: el cliente busca un código y ve **dónde lo venden** (estado, dirección, teléfono). El repuestero se registra gratis y carga su lista. Sin precios en pantalla.
+Directorio multi-local de rodamientos: busca código → locales con teléfono y dirección. Repuestero se registra gratis y sube CSV. Sin precios ni membresía.
 
-> Busca la pieza. Llama al local. El precio lo cuadran ustedes.
+## Monorepo
 
-## Demo local
+```text
+apps/web              # Vite + React (UI)
+packages/shared       # tipos, CSV, estados, búsqueda
+supabase/             # migraciones + seed
+```
 
-1. Instala [Node.js LTS](https://nodejs.org)
-2. `npm install`
-3. `npm start` o `Iniciar_Demo.bat`
-4. http://localhost:3000 — contraseña de acceso: pedir al autor del repo
+## Setup Supabase (obligatorio)
 
-Portafolio UI antiguo (solo URL): http://localhost:3000/portfolio/
+1. Crea un proyecto en https://supabase.com
+2. SQL Editor → pega y ejecuta `supabase/migrations/001_init.sql`
+3. Luego ejecuta `supabase/seed.sql` (6 locales demo)
+4. En Authentication → Providers → Email: activa email (puedes desactivar “Confirm email” para demos)
+5. Copia URL y anon key → `apps/web/.env`:
 
-## Qué incluye
+```bash
+cp apps/web/.env.example apps/web/.env
+# edita VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY
+```
+
+6. En Vercel: mismas variables de entorno.
+
+Login seed: `valencia@demo.local` / `demo1234`
+
+## Local
+
+```bash
+npm install
+npm run dev
+```
+
+Build: `npm run build` · servir: `npm start` o `Iniciar_Demo.bat`
+
+## Flujo
 
 | Pantalla | Función |
 |----------|---------|
-| **Buscar** | Código de rodamiento + filtro por estado → locales (teléfono, dirección). Franja de estadísticas del directorio. Sin precio. Sin marca de terceros. |
-| **Soy repuestero** | Registro gratis, editar local, subir CSV (`codigo,nombre,marca,modelo,observacion`) |
+| **Buscar** | Código + estado → resultados → catálogo del local |
+| **Soy repuestero** | Auth email, perfil, subir catálogo CSV (5 columnas) |
 
-Seed: 6 locales demo en Carabobo, Aragua, Caracas, Zulia, Bolívar, Lara. Prueba `6205`. Login seed: `0412-5550101` / PIN `1234`.
-
-Datos en `localStorage` (demo sin backend). Siguiente paso real: base de datos en la nube.
-
-## Desarrollo
-
-```bash
-npm run dev
-npm run build
-```
+Portafolio UI antiguo: `/portfolio` tras el build.

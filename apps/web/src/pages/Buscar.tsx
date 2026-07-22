@@ -1,40 +1,48 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import type { SearchHit } from "@buscarepuesto/shared";
+import { STATES } from "@buscarepuesto/shared";
 import { BearingVisual } from "../components/BearingVisual";
 import { DealerCatalog } from "../components/DealerCatalog";
 import { DirectoryStats } from "../components/DirectoryStats";
 import { LatestListings } from "../components/LatestListings";
-import { STATES } from "../data/states";
-import { useMarketplace } from "../lib/MarketplaceContext";
-import { searchMarketplace } from "../lib/marketplace";
+import { SetupBanner } from "../components/SetupBanner";
+import { searchListings } from "../lib/api";
+import { useAuth } from "../lib/AuthContext";
+import { supabaseConfigured } from "../lib/supabase";
 
 export function Buscar() {
-  const { dealers } = useMarketplace();
+  const { configured } = useAuth();
   const [query, setQuery] = useState("");
   const [stateFilter, setStateFilter] = useState("");
   const [submitted, setSubmitted] = useState("");
   const [submittedState, setSubmittedState] = useState("");
+  const [results, setResults] = useState<SearchHit[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [searchErr, setSearchErr] = useState("");
   const [catalogDealerId, setCatalogDealerId] = useState<string | null>(null);
-  const [catalogHighlight, setCatalogHighlight] = useState<string>("");
+  const [catalogHighlight, setCatalogHighlight] = useState("");
 
-  const results = useMemo(
-    () =>
-      submitted
-        ? searchMarketplace(dealers, submitted, submittedState)
-        : [],
-    [dealers, submitted, submittedState],
-  );
-
-  const catalogDealer = useMemo(
-    () => dealers.find((d) => d.id === catalogDealerId) ?? null,
-    [dealers, catalogDealerId],
-  );
-
-  function runSearch(q: string, state: string) {
+  async function runSearch(q: string, state: string) {
     setCatalogDealerId(null);
     setQuery(q);
     setStateFilter(state);
     setSubmitted(q.trim());
     setSubmittedState(state);
+    setSearchErr("");
+    if (!q.trim() || !supabaseConfigured) {
+      setResults([]);
+      return;
+    }
+    setSearching(true);
+    try {
+      const hits = await searchListings(q.trim(), state);
+      setResults(hits);
+    } catch (e) {
+      setResults([]);
+      setSearchErr(e instanceof Error ? e.message : "Error al buscar");
+    } finally {
+      setSearching(false);
+    }
   }
 
   function openDealer(dealerId: string, code?: string) {
@@ -43,10 +51,10 @@ export function Buscar() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  if (catalogDealer) {
+  if (catalogDealerId) {
     return (
       <DealerCatalog
-        dealer={catalogDealer}
+        dealerId={catalogDealerId}
         highlightCode={catalogHighlight || submitted}
         onBack={() => setCatalogDealerId(null)}
       />
@@ -55,6 +63,8 @@ export function Buscar() {
 
   return (
     <section className="search-page">
+      {!configured && <SetupBanner />}
+
       <div className="search-hero">
         <h1>¿Qué rodamiento buscas?</h1>
         <p>
@@ -67,7 +77,7 @@ export function Buscar() {
           className="search-form"
           onSubmit={(e) => {
             e.preventDefault();
-            runSearch(query, stateFilter);
+            void runSearch(query, stateFilter);
           }}
         >
           <input
@@ -76,12 +86,14 @@ export function Buscar() {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Ej. 6205-2RS o 25x52x15"
             autoFocus
+            disabled={!configured}
           />
           <select
             className="state-select"
             value={stateFilter}
             onChange={(e) => setStateFilter(e.target.value)}
             aria-label="Filtrar por estado"
+            disabled={!configured}
           >
             <option value="">Todo el país</option>
             {STATES.map((s) => (
@@ -90,18 +102,18 @@ export function Buscar() {
               </option>
             ))}
           </select>
-          <button type="submit" className="btn-primary">
-            Buscar
+          <button type="submit" className="btn-primary" disabled={!configured}>
+            {searching ? "…" : "Buscar"}
           </button>
         </form>
 
-        {!submitted && (
+        {!submitted && configured && (
           <p className="hint">
             Prueba:{" "}
             <button
               type="button"
               className="linkish"
-              onClick={() => runSearch("6205", "")}
+              onClick={() => void runSearch("6205", "")}
             >
               6205
             </button>{" "}
@@ -109,7 +121,7 @@ export function Buscar() {
             <button
               type="button"
               className="linkish"
-              onClick={() => runSearch("6205", "Carabobo")}
+              onClick={() => void runSearch("6205", "Carabobo")}
             >
               6205 en Carabobo
             </button>
@@ -121,11 +133,16 @@ export function Buscar() {
 
       {!submitted && <LatestListings onOpenDealer={openDealer} />}
 
+      {searchErr && <p className="bad">{searchErr}</p>}
+
       {submitted && (
         <p className="results-meta">
-          {results.length} resultado{results.length === 1 ? "" : "s"} para{" "}
-          <strong>{submitted}</strong>
-          {submittedState ? ` · ${submittedState}` : " · nacional"}
+          {searching
+            ? "Buscando…"
+            : `${results.length} resultado${results.length === 1 ? "" : "s"} para `}
+          {!searching && <strong>{submitted}</strong>}
+          {!searching &&
+            (submittedState ? ` · ${submittedState}` : " · nacional")}
           {" · "}
           <button
             type="button"
@@ -134,6 +151,7 @@ export function Buscar() {
               setSubmitted("");
               setSubmittedState("");
               setQuery("");
+              setResults([]);
             }}
           >
             Ver últimos listados
@@ -141,20 +159,19 @@ export function Buscar() {
         </p>
       )}
 
-      {submitted && results.length === 0 && (
+      {submitted && !searching && results.length === 0 && !searchErr && (
         <div className="empty">
           Nadie tiene listado <strong>{submitted}</strong>
-          {submittedState ? ` en ${submittedState}` : ""}. Prueba otro estado o
-          código.
+          {submittedState ? ` en ${submittedState}` : ""}.
         </div>
       )}
 
       {results.length > 0 && (
         <div className="hits-grid">
-          {results.map((hit, i) => (
+          {results.map((hit) => (
             <article
               className="hit-card hit-card-media hit-card-clickable"
-              key={`${hit.dealer.id}-${hit.listing.part_number}-${hit.listing.brand}-${hit.listing.observation}-${i}`}
+              key={hit.listing.id}
             >
               <button
                 type="button"
@@ -179,14 +196,13 @@ export function Buscar() {
                     <strong>{hit.dealer.state}</strong> · {hit.dealer.city}
                   </div>
                   <div className="hit-address">{hit.dealer.address}</div>
-                  <div className="hit-biz">{hit.dealer.businessName}</div>
+                  <div className="hit-biz">{hit.dealer.business_name}</div>
                   <div className="catalog-cta">Ver catálogo del local →</div>
                 </div>
               </button>
               <a
                 className="hit-phone hit-phone-bar"
                 href={`tel:${hit.dealer.phone}`}
-                onClick={(e) => e.stopPropagation()}
               >
                 Llamar {hit.dealer.phone}
               </a>

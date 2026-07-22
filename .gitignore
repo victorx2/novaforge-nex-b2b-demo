@@ -21,6 +21,10 @@ dist/
 Thumbs.db
 .env
 .env.*
+!.env.example
+apps/web/.env
+apps/web/.env.*
+!apps/web/.env.example
 publish-github.ps1
 
 .vercel

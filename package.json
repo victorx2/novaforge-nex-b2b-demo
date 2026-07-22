@@ -1,24 +1,13 @@
 {
-  "name": "nex-fase-a",
-  "version": "1.0.0",
-  "description": "BuscaRepuesto — directorio multi-local: busca pieza, llama al repuestero.",
+  "name": "buscarepuesto",
   "private": true,
-  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "vite build && node tools/copy-portfolio.mjs",
-    "preview": "vite preview",
-    "start": "npx --yes serve dist -l 3000"
-  },
-  "dependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
-  },
-  "devDependencies": {
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "@vitejs/plugin-react": "^4.3.4",
-    "typescript": "~5.7.2",
-    "vite": "^6.0.0"
+    "dev": "npm run dev -w @buscarepuesto/web",
+    "build": "npm run build -w @buscarepuesto/web",
+    "start": "npm run start -w @buscarepuesto/web"
   }
 }

@@ -1,6 +1,7 @@
-import { useMemo } from "react";
-import { useMarketplace } from "../lib/MarketplaceContext";
-import { getLatestListings } from "../lib/latest";
+import { useEffect, useState } from "react";
+import type { SearchHit } from "@buscarepuesto/shared";
+import { fetchLatestListings } from "../lib/api";
+import { supabaseConfigured } from "../lib/supabase";
 import { BearingVisual } from "./BearingVisual";
 
 type Props = {
@@ -8,10 +9,37 @@ type Props = {
 };
 
 export function LatestListings({ onOpenDealer }: Props) {
-  const { dealers } = useMarketplace();
-  const latest = useMemo(() => getLatestListings(dealers, 12), [dealers]);
+  const [latest, setLatest] = useState<SearchHit[]>([]);
+  const [err, setErr] = useState("");
 
-  if (latest.length === 0) return null;
+  useEffect(() => {
+    if (!supabaseConfigured) return;
+    let cancelled = false;
+    fetchLatestListings(12)
+      .then((rows) => {
+        if (!cancelled) setLatest(rows);
+      })
+      .catch((e) => {
+        if (!cancelled)
+          setErr(e instanceof Error ? e.message : "Error al cargar listados");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (!supabaseConfigured) return null;
+  if (err) return <p className="bad">{err}</p>;
+  if (latest.length === 0) {
+    return (
+      <section className="latest-section">
+        <header className="latest-head">
+          <h2>Últimos listados</h2>
+          <p>Aún no hay rodamientos cargados en la base.</p>
+        </header>
+      </section>
+    );
+  }
 
   return (
     <section className="latest-section" aria-label="Últimos listados">
@@ -24,11 +52,11 @@ export function LatestListings({ onOpenDealer }: Props) {
       </header>
 
       <div className="latest-grid">
-        {latest.map((hit, i) => (
+        {latest.map((hit) => (
           <button
             type="button"
             className="latest-card"
-            key={`${hit.dealer.id}-${hit.listing.part_number}-${hit.listing.brand}-${i}`}
+            key={hit.listing.id}
             onClick={() =>
               onOpenDealer(hit.dealer.id, hit.listing.part_number)
             }
@@ -48,7 +76,7 @@ export function LatestListings({ onOpenDealer }: Props) {
               <div className="hit-place">
                 <strong>{hit.dealer.state}</strong> · {hit.dealer.city}
               </div>
-              <div className="hit-biz">{hit.dealer.businessName}</div>
+              <div className="hit-biz">{hit.dealer.business_name}</div>
               <div className="catalog-cta">Ver catálogo del local →</div>
             </div>
           </button>

@@ -1,49 +1,58 @@
 import { useRef, useState, type FormEvent } from "react";
-import { STATES } from "../data/states";
-import { useMarketplace } from "../lib/MarketplaceContext";
-import { CSV_TEMPLATE, parseCsv } from "../lib/parseCsv";
+import { CSV_TEMPLATE, parseCsv, STATES } from "@buscarepuesto/shared";
+import { SetupBanner } from "../components/SetupBanner";
+import { useAuth } from "../lib/AuthContext";
 
 export function Repuestero() {
   const {
+    configured,
+    loading,
     sessionDealer,
+    sessionListings,
     login,
     logout,
     register,
-    updateSessionProfile,
-    mergeSessionListings,
-    setSessionListings,
-    resetDemo,
-  } = useMarketplace();
+    updateProfile,
+    mergeListings,
+    clearListings,
+  } = useAuth();
 
   const [mode, setMode] = useState<"login" | "register">("login");
   const [err, setErr] = useState("");
   const [msg, setMsg] = useState("");
+  const [busy, setBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const [loginPhone, setLoginPhone] = useState("");
-  const [loginPin, setLoginPin] = useState("");
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPass, setLoginPass] = useState("");
 
   const [reg, setReg] = useState({
-    businessName: "",
+    email: "",
+    password: "",
+    business_name: "",
     phone: "",
     address: "",
     state: "Carabobo",
     city: "",
-    pin: "",
   });
 
-  function onLogin(e: FormEvent) {
+  async function onLogin(e: FormEvent) {
     e.preventDefault();
     setErr("");
-    const e2 = login(loginPhone, loginPin);
+    setBusy(true);
+    const e2 = await login(loginEmail.trim(), loginPass);
+    setBusy(false);
     if (e2) setErr(e2);
   }
 
-  function onRegister(e: FormEvent) {
+  async function onRegister(e: FormEvent) {
     e.preventDefault();
     setErr("");
-    const e2 = register(reg);
+    setBusy(true);
+    const e2 = await register(reg);
+    setBusy(false);
     if (e2) setErr(e2);
+    else setMsg("Cuenta creada. Si pide confirmación de email, confírmala e inicia sesión.");
   }
 
   function onFile(file: File) {
@@ -51,17 +60,23 @@ export function Repuestero() {
     setMsg("");
     const reader = new FileReader();
     reader.onload = () => {
-      try {
-        const incoming = parseCsv(String(reader.result ?? ""));
-        if (incoming.length === 0) {
-          setErr("El archivo no tiene filas válidas.");
-          return;
+      void (async () => {
+        try {
+          const incoming = parseCsv(String(reader.result ?? ""));
+          if (incoming.length === 0) {
+            setErr("El archivo no tiene filas válidas.");
+            return;
+          }
+          setBusy(true);
+          const e2 = await mergeListings(incoming);
+          setBusy(false);
+          if (e2) setErr(e2);
+          else setMsg(`Cargados ${incoming.length} ítems en tu catálogo.`);
+        } catch (e) {
+          setBusy(false);
+          setErr(e instanceof Error ? e.message : "Error al leer CSV.");
         }
-        mergeSessionListings(incoming);
-        setMsg(`Cargados ${incoming.length} ítems en tu lista.`);
-      } catch (e) {
-        setErr(e instanceof Error ? e.message : "Error al leer CSV.");
-      }
+      })();
     };
     reader.readAsText(file, "UTF-8");
   }
@@ -71,9 +86,25 @@ export function Repuestero() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "plantilla-lista.csv";
+    a.download = "plantilla-catalogo.csv";
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  if (!configured) {
+    return (
+      <section className="dealer-auth">
+        <SetupBanner />
+      </section>
+    );
+  }
+
+  if (loading) {
+    return (
+      <section className="dealer-auth">
+        <p className="muted">Cargando sesión…</p>
+      </section>
+    );
   }
 
   if (!sessionDealer) {
@@ -82,9 +113,8 @@ export function Repuestero() {
         <header className="panel-head">
           <h2>Cargar catálogo de rodamientos</h2>
           <p>
-            Regístrate gratis, sube tu lista de rodamientos (CSV) y cuando
-            alguien busque un código, te aparece con teléfono y dirección. Sin
-            membresía.
+            Regístrate gratis con email, sube tu CSV y cuando alguien busque un
+            código, te aparece con teléfono y dirección. Sin membresía.
           </p>
         </header>
 
@@ -114,39 +144,62 @@ export function Repuestero() {
         {mode === "login" ? (
           <form className="auth-form" onSubmit={onLogin}>
             <p className="hint">
-              Demo: usa un teléfono seed, p. ej.{" "}
-              <strong>0412-5550101</strong> / PIN <strong>1234</strong>
+              Demo seed: <strong>valencia@demo.local</strong> /{" "}
+              <strong>demo1234</strong>
             </p>
             <label className="field">
-              <span>Teléfono</span>
+              <span>Email</span>
               <input
-                value={loginPhone}
-                onChange={(e) => setLoginPhone(e.target.value)}
-                placeholder="0412-5550101"
+                type="email"
+                value={loginEmail}
+                onChange={(e) => setLoginEmail(e.target.value)}
+                placeholder="tu@email.com"
+                autoComplete="email"
               />
             </label>
             <label className="field">
-              <span>PIN</span>
+              <span>Contraseña</span>
               <input
                 type="password"
-                value={loginPin}
-                onChange={(e) => setLoginPin(e.target.value)}
-                placeholder="1234"
+                value={loginPass}
+                onChange={(e) => setLoginPass(e.target.value)}
+                placeholder="••••••••"
+                autoComplete="current-password"
               />
             </label>
             {err && <p className="bad">{err}</p>}
-            <button type="submit" className="btn-primary">
-              Entrar
+            <button type="submit" className="btn-primary" disabled={busy}>
+              {busy ? "…" : "Entrar"}
             </button>
           </form>
         ) : (
           <form className="auth-form" onSubmit={onRegister}>
             <label className="field">
+              <span>Email</span>
+              <input
+                type="email"
+                value={reg.email}
+                onChange={(e) => setReg((r) => ({ ...r, email: e.target.value }))}
+                placeholder="tu@email.com"
+              />
+            </label>
+            <label className="field">
+              <span>Contraseña (mín. 6)</span>
+              <input
+                type="password"
+                value={reg.password}
+                onChange={(e) =>
+                  setReg((r) => ({ ...r, password: e.target.value }))
+                }
+                placeholder="••••••••"
+              />
+            </label>
+            <label className="field">
               <span>Nombre del negocio</span>
               <input
-                value={reg.businessName}
+                value={reg.business_name}
                 onChange={(e) =>
-                  setReg((r) => ({ ...r, businessName: e.target.value }))
+                  setReg((r) => ({ ...r, business_name: e.target.value }))
                 }
                 placeholder="Repuestos El Centro"
               />
@@ -198,18 +251,10 @@ export function Repuestero() {
                 />
               </label>
             </div>
-            <label className="field">
-              <span>PIN (mín. 4)</span>
-              <input
-                type="password"
-                value={reg.pin}
-                onChange={(e) => setReg((r) => ({ ...r, pin: e.target.value }))}
-                placeholder="••••"
-              />
-            </label>
             {err && <p className="bad">{err}</p>}
-            <button type="submit" className="btn-primary">
-              Crear cuenta gratis
+            {msg && <p className="ok">{msg}</p>}
+            <button type="submit" className="btn-primary" disabled={busy}>
+              {busy ? "…" : "Crear cuenta gratis"}
             </button>
           </form>
         )}
@@ -221,12 +266,12 @@ export function Repuestero() {
     <section className="dealer-panel">
       <header className="panel-head dealer-head">
         <div>
-          <h2>{sessionDealer.businessName}</h2>
+          <h2>{sessionDealer.business_name}</h2>
           <p>
             {sessionDealer.state} · {sessionDealer.city} · {sessionDealer.phone}
           </p>
         </div>
-        <button type="button" className="btn-ghost" onClick={logout}>
+        <button type="button" className="btn-ghost" onClick={() => void logout()}>
           Salir
         </button>
       </header>
@@ -241,9 +286,9 @@ export function Repuestero() {
           <label className="field">
             <span>Nombre</span>
             <input
-              value={sessionDealer.businessName}
+              value={sessionDealer.business_name}
               onChange={(e) =>
-                updateSessionProfile({ businessName: e.target.value })
+                void updateProfile({ business_name: e.target.value })
               }
             />
           </label>
@@ -251,30 +296,28 @@ export function Repuestero() {
             <span>Teléfono</span>
             <input
               value={sessionDealer.phone}
-              onChange={(e) => updateSessionProfile({ phone: e.target.value })}
+              onChange={(e) => void updateProfile({ phone: e.target.value })}
             />
           </label>
           <label className="field">
             <span>Dirección</span>
             <input
               value={sessionDealer.address}
-              onChange={(e) =>
-                updateSessionProfile({ address: e.target.value })
-              }
+              onChange={(e) => void updateProfile({ address: e.target.value })}
             />
           </label>
           <label className="field">
             <span>Ciudad</span>
             <input
               value={sessionDealer.city}
-              onChange={(e) => updateSessionProfile({ city: e.target.value })}
+              onChange={(e) => void updateProfile({ city: e.target.value })}
             />
           </label>
           <label className="field">
             <span>Estado</span>
             <select
               value={sessionDealer.state}
-              onChange={(e) => updateSessionProfile({ state: e.target.value })}
+              onChange={(e) => void updateProfile({ state: e.target.value })}
             >
               {STATES.map((s) => (
                 <option key={s} value={s}>
@@ -289,8 +332,8 @@ export function Repuestero() {
       <header className="panel-head">
         <h2>Mi catálogo de rodamientos</h2>
         <p>
-          Sube CSV con 5 columnas: código, nombre, marca, modelo, observación
-          (Nuevo / Usado…). Eso es lo que el cliente ve en tu catálogo público.
+          Sube CSV: código, nombre, marca, modelo, observación. Queda en la base
+          compartida en la nube.
         </p>
       </header>
 
@@ -298,6 +341,7 @@ export function Repuestero() {
         <button
           type="button"
           className="btn-primary"
+          disabled={busy}
           onClick={() => fileRef.current?.click()}
         >
           Subir catálogo CSV
@@ -319,34 +363,29 @@ export function Repuestero() {
         <button
           type="button"
           className="btn-ghost"
+          disabled={busy}
           onClick={() => {
-            setSessionListings([]);
-            setMsg("Lista vaciada.");
-            setErr("");
+            void (async () => {
+              setBusy(true);
+              const e2 = await clearListings();
+              setBusy(false);
+              if (e2) setErr(e2);
+              else {
+                setMsg("Catálogo vaciado.");
+                setErr("");
+              }
+            })();
           }}
         >
           Vaciar catálogo
         </button>
-        <button
-          type="button"
-          className="btn-ghost"
-          onClick={() => {
-            resetDemo();
-            setMsg("Demo restaurado (todos los locales seed).");
-            setErr("");
-          }}
-        >
-          Restaurar demo
-        </button>
-        <span className="toolbar-meta">
-          {sessionDealer.listings.length} ítems
-        </span>
+        <span className="toolbar-meta">{sessionListings.length} ítems</span>
       </div>
 
       {msg && <p className="ok">{msg}</p>}
       {err && <p className="bad">{err}</p>}
 
-      {sessionDealer.listings.length === 0 ? (
+      {sessionListings.length === 0 ? (
         <div className="empty">
           Aún no tienes rodamientos en el catálogo. Sube el CSV o descarga la
           plantilla.
@@ -364,10 +403,8 @@ export function Repuestero() {
               </tr>
             </thead>
             <tbody>
-              {sessionDealer.listings.map((item, i) => (
-                <tr
-                  key={`${item.part_number}-${item.brand}-${item.observation}-${i}`}
-                >
+              {sessionListings.map((item) => (
+                <tr key={item.id}>
                   <td className="code">{item.part_number}</td>
                   <td>{item.name}</td>
                   <td>{item.brand}</td>

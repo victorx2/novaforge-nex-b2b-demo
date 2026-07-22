@@ -1,10 +1,10 @@
-import type { Listing } from "./types";
+import type { ListingInput } from "./types";
 
 /**
  * CSV tipo Víctor (5 columnas):
  * codigo,nombre,marca,modelo,observacion
  */
-export function parseCsv(text: string): Listing[] {
+export function parseCsv(text: string): ListingInput[] {
   const lines = text
     .replace(/^\uFEFF/, "")
     .split(/\r?\n/)
@@ -22,11 +22,29 @@ export function parseCsv(text: string): Listing[] {
   const dataRows = hasHeader ? rows.slice(1) : rows;
   const col = hasHeader
     ? {
-        code: indexOf(header, ["codigo", "part_number", "codigo_pieza", "sku", "numero_de_parte"]),
-        name: indexOf(header, ["nombre", "name", "description", "descripcion", "producto"]),
+        code: indexOf(header, [
+          "codigo",
+          "part_number",
+          "codigo_pieza",
+          "sku",
+          "numero_de_parte",
+        ]),
+        name: indexOf(header, [
+          "nombre",
+          "name",
+          "description",
+          "descripcion",
+          "producto",
+        ]),
         brand: indexOf(header, ["marca", "brand"]),
         model: indexOf(header, ["modelo", "model", "medida", "dims"]),
-        obs: indexOf(header, ["observacion", "observation", "obs", "condicion", "condition"]),
+        obs: indexOf(header, [
+          "observacion",
+          "observation",
+          "obs",
+          "condicion",
+          "condition",
+        ]),
       }
     : { code: 0, name: 1, brand: 2, model: 3, obs: 4 };
 
@@ -34,7 +52,7 @@ export function parseCsv(text: string): Listing[] {
     throw new Error("CSV sin columna de código (codigo / part_number).");
   }
 
-  const items: Listing[] = [];
+  const items: ListingInput[] = [];
   for (const row of dataRows) {
     const part_number = (row[col.code] ?? "").trim();
     if (!part_number) continue;
@@ -43,8 +61,7 @@ export function parseCsv(text: string): Listing[] {
       name: (col.name >= 0 ? row[col.name] : "")?.trim() || part_number,
       brand: (col.brand >= 0 ? row[col.brand] : "")?.trim() || "—",
       model: (col.model >= 0 ? row[col.model] : "")?.trim() || "",
-      observation:
-        (col.obs >= 0 ? row[col.obs] : "")?.trim() || "Nuevo",
+      observation: (col.obs >= 0 ? row[col.obs] : "")?.trim() || "Nuevo",
     });
   }
   return items;

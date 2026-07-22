@@ -1,12 +1,11 @@
 @echo off
 chcp 65001 >nul
-title NovaForge NEX - Fase A (Buscar + Stock)
+title BuscaRepuesto
 cd /d "%~dp0"
 
 echo.
 echo  ========================================
-echo   NEX FASE A — Buscar + Mi stock
-echo   (contraseña: pedir al autor)
+echo   BuscaRepuesto — directorio real
 echo  ========================================
 echo.
 
@@ -29,7 +28,7 @@ if not exist "node_modules\" (
     )
 )
 
-echo  Compilando demo...
+echo  Compilando...
 call npm run build
 if errorlevel 1 (
     echo  ERROR: build fallo.
@@ -37,26 +36,25 @@ if errorlevel 1 (
     exit /b 1
 )
 
-if not exist "dist\index.html" (
-    echo  ERROR: No se genero dist\index.html
+if not exist "apps\web\dist\index.html" (
+    echo  ERROR: No se genero apps\web\dist\index.html
     pause
     exit /b 1
 )
 
-echo  Liberando puerto 3000 (si hay servidor viejo)...
+echo  Liberando puerto 3000...
 for /f "tokens=5" %%p in ('netstat -ano ^| findstr ":3000" ^| findstr "LISTENING"') do (
   taskkill /F /PID %%p >nul 2>&1
 )
 
-echo  Iniciando servidor Fase A (NO la maqueta)...
-start "Servidor NEX Fase A" cmd /k "cd /d "%~dp0" && npx --yes serve dist -l 3000 --no-port-switching"
+echo  Iniciando servidor...
+start "BuscaRepuesto" cmd /k "cd /d "%~dp0" && npm start"
 
 timeout /t 5 /nobreak >nul
 start http://localhost:3000
 
 echo.
 echo  Listo: http://localhost:3000
-echo  Portafolio NEX completo: http://localhost:3000/portfolio/
-echo  Cierra la ventana del servidor para detenerlo.
+echo  Configura apps\web\.env con Supabase (ver README).
 echo.
 pause

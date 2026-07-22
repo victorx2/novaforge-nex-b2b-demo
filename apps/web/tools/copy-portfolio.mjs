@@ -2,9 +2,10 @@ import { cpSync, existsSync, mkdirSync, rmSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const src = join(root, "portfolio-demo");
-const dest = join(root, "dist", "portfolio");
+const webRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
+const repoRoot = join(webRoot, "../..");
+const src = join(repoRoot, "portfolio-demo");
+const dest = join(webRoot, "dist", "portfolio");
 
 if (!existsSync(src)) {
   console.warn("portfolio-demo/ no encontrado — se omite copia.");
@@ -14,6 +15,6 @@ if (!existsSync(src)) {
 if (existsSync(dest)) {
   rmSync(dest, { recursive: true, force: true });
 }
-mkdirSync(join(root, "dist"), { recursive: true });
+mkdirSync(join(webRoot, "dist"), { recursive: true });
 cpSync(src, dest, { recursive: true });
-console.log("Copiado portfolio-demo → dist/portfolio");
+console.log("Copiado portfolio-demo → apps/web/dist/portfolio");

@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { PasswordGate } from "./components/PasswordGate";
-import { MarketplaceProvider } from "./lib/MarketplaceContext";
+import { AuthProvider } from "./lib/AuthContext";
 import { Buscar } from "./pages/Buscar";
 import { Repuestero } from "./pages/Repuestero";
 
@@ -56,10 +55,8 @@ function Shell() {
 
 export default function App() {
   return (
-    <PasswordGate>
-      <MarketplaceProvider>
-        <Shell />
-      </MarketplaceProvider>
-    </PasswordGate>
+    <AuthProvider>
+      <Shell />
+    </AuthProvider>
   );
 }

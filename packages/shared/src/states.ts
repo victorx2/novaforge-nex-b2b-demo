@@ -1,4 +1,4 @@
-/** Estados usados en el demo (filtro de búsqueda). */
+/** Estados de Venezuela (filtro de búsqueda). */
 export const STATES = [
   "Amazonas",
   "Anzoátegui",
