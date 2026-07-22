@@ -3,6 +3,7 @@ import type { Dealer, Listing, SearchHit } from "./types";
 
 const STORAGE_KEY = "busca-repuesto-dealers-v1";
 const SESSION_KEY = "busca-repuesto-session";
+const UPDATED_KEY = "busca-repuesto-updated-at";
 
 export function loadDealers(): Dealer[] {
   try {
@@ -20,9 +21,23 @@ export function loadDealers(): Dealer[] {
 export function saveDealers(dealers: Dealer[]): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(dealers));
+    localStorage.setItem(UPDATED_KEY, String(Date.now()));
   } catch {
     /* ignore */
   }
+}
+
+export function getLastUpdatedAt(): number {
+  try {
+    const raw = localStorage.getItem(UPDATED_KEY);
+    if (raw) {
+      const n = Number(raw);
+      if (Number.isFinite(n) && n > 0) return n;
+    }
+  } catch {
+    /* ignore */
+  }
+  return Date.now();
 }
 
 export function resetDealers(): Dealer[] {

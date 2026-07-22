@@ -20,7 +20,7 @@ function Shell() {
             <div className="brand-text">
               <div className="brand-name">BuscaRepuesto</div>
               <div className="brand-tagline">
-                Encuentra la pieza · llama al local
+                Rodamientos · encuentra y llama al local
               </div>
             </div>
           </div>

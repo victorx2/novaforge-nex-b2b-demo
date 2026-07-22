@@ -17,7 +17,7 @@ Portafolio UI antiguo (solo URL): http://localhost:3000/portfolio/
 
 | Pantalla | Función |
 |----------|---------|
-| **Buscar** | Código / medida + filtro por estado → cuadrícula de locales (teléfono, dirección). Sin precio. |
+| **Buscar** | Código de rodamiento + filtro por estado → locales (teléfono, dirección). Franja de estadísticas del directorio. Sin precio. Sin marca de terceros. |
 | **Soy repuestero** | Registro gratis, editar local, subir CSV (`codigo,nombre,marca,modelo,observacion`) |
 
 Seed: 6 locales demo en Carabobo, Aragua, Caracas, Zulia, Bolívar, Lara. Prueba `6205`. Login seed: `0412-5550101` / PIN `1234`.

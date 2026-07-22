@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { DirectoryStats } from "../components/DirectoryStats";
 import { STATES } from "../data/states";
 import { useMarketplace } from "../lib/MarketplaceContext";
 import { searchMarketplace } from "../lib/marketplace";
@@ -28,10 +29,10 @@ export function Buscar() {
   return (
     <section className="search-page">
       <div className="search-hero">
-        <h1>¿Qué pieza buscas?</h1>
+        <h1>¿Qué rodamiento buscas?</h1>
         <p>
-          Escribe el código. Te mostramos en qué locales la tienen — con
-          teléfono y dirección. El precio lo cuadran ustedes.
+          Escribe el código (ej. 6205-2RS). Te mostramos en qué locales lo tienen
+          — con teléfono y dirección. El precio lo cuadran ustedes.
         </p>
 
         <form
@@ -87,6 +88,8 @@ export function Buscar() {
           </p>
         )}
       </div>
+
+      <DirectoryStats />
 
       {submitted && (
         <p className="results-meta">

@@ -35,7 +35,10 @@ export function PasswordGate({ children }: { children: ReactNode }) {
     <div className="gate">
       <form className="gate-card" onSubmit={onSubmit}>
         <h1>BuscaRepuesto</h1>
-        <p>Busca la pieza. Llama al local. El precio lo cuadran ustedes.</p>
+        <p>
+          Busca el rodamiento por código. Te mostramos locales con teléfono y
+          dirección. El precio lo cuadran ustedes.
+        </p>
         <div className="gate-err">{err}</div>
         <input
           type="password"
