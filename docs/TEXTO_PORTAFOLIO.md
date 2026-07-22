@@ -1,28 +1,27 @@
-# Texto de presentación — Portafolio
+# Texto de presentación — Portafolio / Fase A
 
-## Versión corta
+## Versión corta (cliente / repuestero)
 
-Desarrollé una maqueta B2B industrial (panel, catálogo técnico, pedidos, logística, fiscal y BOM). La versión pública usa marca ficticia **NovaForge / NEX**, datos demo (`$0.00` / `XXXX`) y acceso con contraseña + `robots.txt` noindex. El foco es UI/UX y producto, no datos de negocio reales.
+Demo **Fase A**: buscar por código de rodamiento y ver **cantidad + ubicación**. Menú solo **Buscar** y **Mi stock**. Importación CSV. Datos demo.
 
-## Caso de estudio
+## Versión portafolio (ecosistema)
 
-### Panel de Gestión NEX — Ecosistema Industrial B2B (Demo)
+La maqueta B2B completa (panel, catálogo técnico, pedidos, logística, fiscal, BOM, sectores, IA simulada) sigue disponible en **`/portfolio/`** con marca ficticia NovaForge / NEX.
+
+### Caso de estudio — Fase A
 
 **Rol:** Desarrollador Web  
-**Tipo:** Prototipo de alta fidelidad (UI/UX)  
-**Estado:** Demo de portafolio (datos ficticios)
+**Tipo:** MVP de demostración  
+**Estado:** Demo cliente (seed + localStorage)
 
 #### Qué demuestra
-- Landing rediseñada (hero 1 columna, flujo en 4 pasos, IA abajo)  
-- Hub con buscador técnico y escaneo IA simulado  
-- Panel de usuario: pedidos, fidelización, tracking y centro fiscal B2B  
-- Catálogos: sellos, rodamientos, grasas, transmisión  
-- Sectores, pasarela de pago, planificador BOM y blog técnico  
+- Búsqueda por código / medida
+- Inventario editable + CSV
+- UI simple alineada a psicología de venta al repuestero
 
 #### Criterio de confidencialidad
-- Sin nombres reales de empresas, RIF ni domicilios  
-- Precios/stocks/métricas en marcadores demo  
-- Ubicaciones y logística genéricas  
+- Sin nombres reales de empresas, RIF ni domicilios
+- Seed genérico de series 60/62/63
 
 #### Stack
-SPA React (estático), CSS utilitario, Node para servir local.
+Vite + React + TypeScript, deploy estático (`dist/`), portafolio estático en `dist/portfolio/`.

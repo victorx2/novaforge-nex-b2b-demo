@@ -16,6 +16,7 @@ docs/extraccion*
 
 # System
 node_modules/
+dist/
 .DS_Store
 Thumbs.db
 .env

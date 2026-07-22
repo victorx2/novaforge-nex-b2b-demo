@@ -1,22 +1,43 @@
-# NovaForge NEX — Demo B2B (Portafolio)
+# NovaForge NEX — Fase A (demo cliente)
 
-Prototipo UI/UX de un ecosistema digital B2B industrial (catálogo técnico, panel de usuario, logística, fiscal y herramientas de ingeniería).
+Demo mínima para el perfil **repuestero**: **Buscar** + **Mi stock**.
 
-**Marca y datos:** 100% ficticios (NovaForge / NEX). Pensado para portafolio.
+> Pon el código. Si está, te dice cuántos y dónde.
+
+La maqueta de ecosistema completa (Industria, Catálogo, Planta, Cuenta, etc.) quedó archivada en **`/portfolio/`**.
 
 ## Demo local
+
 1. Instala [Node.js LTS](https://nodejs.org)
-2. `npm start` o doble clic en `Iniciar_Demo.bat`
-3. Abre http://localhost:3000
-4. Contraseña de acceso (solicitar al autor del repo; no se publica en la pantalla de login)
+2. `npm install`
+3. `npm start` (sirve `dist/`) o doble clic en `Iniciar_Demo.bat` (build + servir)
+4. Abre http://localhost:3000
+5. Contraseña de acceso (solicitar al autor del repo; no se publica en la pantalla de login)
+
+Portafolio UI/UX completo: http://localhost:3000/portfolio/
+
+## Desarrollo
+
+```bash
+npm run dev      # Vite hot reload
+npm run build    # genera dist/ + copia portfolio-demo → dist/portfolio
+```
+
+## Qué incluye Fase A
+
+| Pantalla | Función |
+|----------|---------|
+| **Buscar** | Código, medida `25x52x15` o marca → cantidad + ubicación |
+| **Mi stock** | Tabla, editar cantidad, importar CSV, plantilla, restaurar seed |
+
+Sin backend: inventario en `localStorage`. Seed de rodamientos demo incluido.
 
 ## Protecciones
-- Gate de acceso por contraseña
-- `robots.txt` → `Disallow: /`
-- Meta + header `noindex, nofollow`
 
-## Stack
-SPA React (build estático), CSS propio, despliegue estático.
+- Gate por contraseña (sessionStorage)
+- `robots.txt` → `Disallow: /`
+- Meta / header `noindex, nofollow`
 
 ## Aviso
-Esta demo muestra estructura y diseño. No incluye datos de ninguna entidad de trabajo real.
+
+Datos ficticios. No incluye inventario de ninguna empresa real.

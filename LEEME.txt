@@ -1,14 +1,17 @@
 ========================================
-  NOVAFORGE NEX - DEMO PORTAFOLIO
+  NEX FASE A — Buscar + Mi stock
 ========================================
 
 REQUISITO: Node.js LTS (https://nodejs.org)
 
 PASOS:
   1. Doble clic en Iniciar_Demo.bat
-     o: npm start
+     o: npm install && npm run build && npm start
   2. Abrir http://localhost:3000
-  3. Pedir la contrasena al autor (no aparece en pantalla)
+  3. Pedir la contrasena al autor (misma del portafolio)
+
+PORTAFOLIO COMPLETO (maqueta ecosistema):
+  http://localhost:3000/portfolio/
 
 NOTA: Datos ficticios. robots.txt bloquea indexacion.
 

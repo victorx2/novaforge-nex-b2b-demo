@@ -1,7 +1,12 @@
 {
+  "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/((?!robots\\.txt).*)", "destination": "/index.html" }
+    { "source": "/portfolio", "destination": "/portfolio/index.html" },
+    {
+      "source": "/((?!robots\\.txt|portfolio(?:/|$)|assets/).*)",
+      "destination": "/index.html"
+    }
   ],
   "headers": [
     {
