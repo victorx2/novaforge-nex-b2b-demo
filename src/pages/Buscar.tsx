@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { BearingVisual } from "../components/BearingVisual";
+import { DealerCatalog } from "../components/DealerCatalog";
 import { DirectoryStats } from "../components/DirectoryStats";
 import { LatestListings } from "../components/LatestListings";
 import { STATES } from "../data/states";
@@ -12,6 +13,8 @@ export function Buscar() {
   const [stateFilter, setStateFilter] = useState("");
   const [submitted, setSubmitted] = useState("");
   const [submittedState, setSubmittedState] = useState("");
+  const [catalogDealerId, setCatalogDealerId] = useState<string | null>(null);
+  const [catalogHighlight, setCatalogHighlight] = useState<string>("");
 
   const results = useMemo(
     () =>
@@ -21,11 +24,33 @@ export function Buscar() {
     [dealers, submitted, submittedState],
   );
 
+  const catalogDealer = useMemo(
+    () => dealers.find((d) => d.id === catalogDealerId) ?? null,
+    [dealers, catalogDealerId],
+  );
+
   function runSearch(q: string, state: string) {
+    setCatalogDealerId(null);
     setQuery(q);
     setStateFilter(state);
     setSubmitted(q.trim());
     setSubmittedState(state);
+  }
+
+  function openDealer(dealerId: string, code?: string) {
+    setCatalogDealerId(dealerId);
+    setCatalogHighlight(code ?? "");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  if (catalogDealer) {
+    return (
+      <DealerCatalog
+        dealer={catalogDealer}
+        highlightCode={catalogHighlight || submitted}
+        onBack={() => setCatalogDealerId(null)}
+      />
+    );
   }
 
   return (
@@ -33,8 +58,9 @@ export function Buscar() {
       <div className="search-hero">
         <h1>¿Qué rodamiento buscas?</h1>
         <p>
-          Escribe el código (ej. 6205-2RS). Te mostramos en qué locales lo tienen
-          — con teléfono y dirección. El precio lo cuadran ustedes.
+          Escribe el código. Te mostramos en qué locales lo tienen. Toca un
+          local para ver <strong>todo su catálogo de rodamientos</strong>. El
+          precio lo cuadran por teléfono.
         </p>
 
         <form
@@ -93,11 +119,7 @@ export function Buscar() {
 
       <DirectoryStats />
 
-      {!submitted && (
-        <LatestListings
-          onPickCode={(code, state) => runSearch(code, state ?? "")}
-        />
-      )}
+      {!submitted && <LatestListings onOpenDealer={openDealer} />}
 
       {submitted && (
         <p className="results-meta">
@@ -131,30 +153,43 @@ export function Buscar() {
         <div className="hits-grid">
           {results.map((hit, i) => (
             <article
-              className="hit-card hit-card-media"
+              className="hit-card hit-card-media hit-card-clickable"
               key={`${hit.dealer.id}-${hit.listing.part_number}-${hit.listing.brand}-${hit.listing.observation}-${i}`}
             >
-              <BearingVisual
-                partNumber={hit.listing.part_number}
-                brand={hit.listing.brand}
-              />
-              <div className="hit-body">
-                <div className="hit-code">{hit.listing.part_number}</div>
-                <div className="hit-name">{hit.listing.name}</div>
-                <div className="hit-meta">
-                  <span>{hit.listing.brand}</span>
-                  {hit.listing.model && <span>· {hit.listing.model}</span>}
+              <button
+                type="button"
+                className="hit-open"
+                onClick={() =>
+                  openDealer(hit.dealer.id, hit.listing.part_number)
+                }
+              >
+                <BearingVisual
+                  partNumber={hit.listing.part_number}
+                  brand={hit.listing.brand}
+                />
+                <div className="hit-body">
+                  <div className="hit-code">{hit.listing.part_number}</div>
+                  <div className="hit-name">{hit.listing.name}</div>
+                  <div className="hit-meta">
+                    <span>{hit.listing.brand}</span>
+                    {hit.listing.model && <span>· {hit.listing.model}</span>}
+                  </div>
+                  <div className="hit-obs">{hit.listing.observation}</div>
+                  <div className="hit-place">
+                    <strong>{hit.dealer.state}</strong> · {hit.dealer.city}
+                  </div>
+                  <div className="hit-address">{hit.dealer.address}</div>
+                  <div className="hit-biz">{hit.dealer.businessName}</div>
+                  <div className="catalog-cta">Ver catálogo del local →</div>
                 </div>
-                <div className="hit-obs">{hit.listing.observation}</div>
-                <div className="hit-place">
-                  <strong>{hit.dealer.state}</strong> · {hit.dealer.city}
-                </div>
-                <div className="hit-address">{hit.dealer.address}</div>
-                <a className="hit-phone" href={`tel:${hit.dealer.phone}`}>
-                  {hit.dealer.phone}
-                </a>
-                <div className="hit-biz">{hit.dealer.businessName}</div>
-              </div>
+              </button>
+              <a
+                className="hit-phone hit-phone-bar"
+                href={`tel:${hit.dealer.phone}`}
+                onClick={(e) => e.stopPropagation()}
+              >
+                Llamar {hit.dealer.phone}
+              </a>
             </article>
           ))}
         </div>

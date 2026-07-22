@@ -4,10 +4,10 @@ import { getLatestListings } from "../lib/latest";
 import { BearingVisual } from "./BearingVisual";
 
 type Props = {
-  onPickCode: (code: string, state?: string) => void;
+  onOpenDealer: (dealerId: string, code?: string) => void;
 };
 
-export function LatestListings({ onPickCode }: Props) {
+export function LatestListings({ onOpenDealer }: Props) {
   const { dealers } = useMarketplace();
   const latest = useMemo(() => getLatestListings(dealers, 12), [dealers]);
 
@@ -17,7 +17,10 @@ export function LatestListings({ onPickCode }: Props) {
     <section className="latest-section" aria-label="Últimos listados">
       <header className="latest-head">
         <h2>Últimos listados</h2>
-        <p>Rodamientos recién cargados por locales. Toca uno para buscarlo.</p>
+        <p>
+          Rodamientos recién cargados. Toca una tarjeta para ver el{" "}
+          <strong>catálogo completo</strong> de ese local.
+        </p>
       </header>
 
       <div className="latest-grid">
@@ -26,7 +29,9 @@ export function LatestListings({ onPickCode }: Props) {
             type="button"
             className="latest-card"
             key={`${hit.dealer.id}-${hit.listing.part_number}-${hit.listing.brand}-${i}`}
-            onClick={() => onPickCode(hit.listing.part_number, hit.dealer.state)}
+            onClick={() =>
+              onOpenDealer(hit.dealer.id, hit.listing.part_number)
+            }
           >
             <BearingVisual
               partNumber={hit.listing.part_number}
@@ -44,6 +49,7 @@ export function LatestListings({ onPickCode }: Props) {
                 <strong>{hit.dealer.state}</strong> · {hit.dealer.city}
               </div>
               <div className="hit-biz">{hit.dealer.businessName}</div>
+              <div className="catalog-cta">Ver catálogo del local →</div>
             </div>
           </button>
         ))}

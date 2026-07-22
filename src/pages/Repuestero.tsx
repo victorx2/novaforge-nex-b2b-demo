@@ -80,10 +80,11 @@ export function Repuestero() {
     return (
       <section className="dealer-auth">
         <header className="panel-head">
-          <h2>Soy repuestero</h2>
+          <h2>Cargar catálogo de rodamientos</h2>
           <p>
-            Regístrate gratis, carga tu lista y aparece cuando alguien busca esa
-            pieza. Sin membresía.
+            Regístrate gratis, sube tu lista de rodamientos (CSV) y cuando
+            alguien busque un código, te aparece con teléfono y dirección. Sin
+            membresía.
           </p>
         </header>
 
@@ -286,10 +287,10 @@ export function Repuestero() {
       </section>
 
       <header className="panel-head">
-        <h2>Mi lista</h2>
+        <h2>Mi catálogo de rodamientos</h2>
         <p>
-          Sube CSV: código, nombre, marca, modelo, observación. Quien busque ese
-          código te verá con tu teléfono.
+          Sube CSV con 5 columnas: código, nombre, marca, modelo, observación
+          (Nuevo / Usado…). Eso es lo que el cliente ve en tu catálogo público.
         </p>
       </header>
 
@@ -299,7 +300,7 @@ export function Repuestero() {
           className="btn-primary"
           onClick={() => fileRef.current?.click()}
         >
-          Subir CSV
+          Subir catálogo CSV
         </button>
         <input
           ref={fileRef}
@@ -324,7 +325,7 @@ export function Repuestero() {
             setErr("");
           }}
         >
-          Vaciar mi lista
+          Vaciar catálogo
         </button>
         <button
           type="button"
@@ -347,7 +348,8 @@ export function Repuestero() {
 
       {sessionDealer.listings.length === 0 ? (
         <div className="empty">
-          Aún no tienes piezas. Sube el CSV o descarga la plantilla.
+          Aún no tienes rodamientos en el catálogo. Sube el CSV o descarga la
+          plantilla.
         </div>
       ) : (
         <div className="table-wrap">

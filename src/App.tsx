@@ -42,6 +42,7 @@ function Shell() {
             onClick={() => setPage("repuestero")}
           >
             Soy repuestero
+            <span className="tab-sub"> · catálogo</span>
           </button>
         </div>
       </nav>

@@ -127,6 +127,16 @@ select {
   border-bottom-color: var(--accent);
 }
 
+.tab-sub {
+  font-weight: 500;
+  color: var(--muted);
+  font-size: 0.85em;
+}
+
+.tab.active .tab-sub {
+  color: var(--accent);
+}
+
 .main {
   flex: 1;
   padding: 1.75rem 1.25rem 2.75rem;
@@ -625,6 +635,97 @@ tr:last-child td {
 .bad {
   color: var(--danger);
   font-size: 0.9rem;
+}
+
+.catalog-cta {
+  margin-top: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.hit-card-clickable {
+  padding: 0;
+  overflow: hidden;
+}
+
+.hit-open {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.75rem 0.75rem 0.5rem;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.hit-phone-bar {
+  display: block;
+  text-align: center;
+  padding: 0.65rem;
+  border-top: 1px solid var(--line);
+  background: var(--accent-soft);
+  font-size: 0.92rem;
+}
+
+.latest-card-static {
+  cursor: default;
+}
+
+.latest-card-static:hover {
+  border-color: var(--line);
+  box-shadow: none;
+}
+
+.catalog-hit {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.catalog-match {
+  margin-top: 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.dealer-catalog {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.catalog-back {
+  align-self: flex-start;
+}
+
+.catalog-hero h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.5rem;
+}
+
+.catalog-place {
+  margin: 0 0 0.2rem;
+}
+
+.catalog-address {
+  margin: 0 0 0.35rem;
+  color: var(--muted);
+}
+
+.catalog-phone {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
+.catalog-hero .muted {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
 }
 
 .gate {
