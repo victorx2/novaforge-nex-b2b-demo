@@ -8,14 +8,19 @@ import {
   type ReactNode,
 } from "react";
 import type { User } from "@supabase/supabase-js";
-import type { DealerProfile, ListingInput, ListingRow } from "@buscarepuesto/shared";
 import {
-  fetchDealer,
+  isAdminUser,
+  type DealerProfile,
+  type ListingInput,
+  type ListingRow,
+} from "@buscarepuesto/shared";
+import {
+  ensureDealerForUser,
+  fetchDealerByUserId,
   fetchDealerListings,
   mergeDealerListings,
   replaceDealerListings,
   updateDealerProfile,
-  upsertDealerProfile,
 } from "./api";
 import { requireSupabase, supabase, supabaseConfigured } from "./supabase";
 
@@ -33,6 +38,7 @@ type Ctx = {
   configured: boolean;
   loading: boolean;
   user: User | null;
+  isAdmin: boolean;
   sessionDealer: DealerProfile | null;
   sessionListings: ListingRow[];
   refreshSessionDealer: () => Promise<void>;
@@ -67,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSessionListings([]);
       return;
     }
-    let dealer = await fetchDealer(user.id);
+    let dealer = await fetchDealerByUserId(user.id);
     if (!dealer) {
       const meta = user.user_metadata ?? {};
       if (
@@ -77,15 +83,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         meta.state &&
         meta.city
       ) {
-        await upsertDealerProfile({
-          id: user.id,
+        dealer = await ensureDealerForUser(user.id, {
           business_name: String(meta.business_name),
           phone: String(meta.phone),
           address: String(meta.address),
           state: String(meta.state),
           city: String(meta.city),
         });
-        dealer = await fetchDealer(user.id);
       }
     }
     setSessionDealer(dealer);
@@ -178,8 +182,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       if (data.session) {
-        await upsertDealerProfile({
-          id: uid,
+        await ensureDealerForUser(uid, {
           business_name: input.business_name.trim(),
           phone: input.phone.trim(),
           address: input.address.trim(),
@@ -202,48 +205,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         >
       >,
     ) => {
-      if (!user) return "Debes iniciar sesión.";
+      if (!user || !sessionDealer) return "Debes iniciar sesión.";
       try {
-        await updateDealerProfile(user.id, patch);
+        await updateDealerProfile(sessionDealer.id, patch);
         await refreshSessionDealer();
         return null;
       } catch (e) {
         return e instanceof Error ? e.message : "Error al guardar.";
       }
     },
-    [user, refreshSessionDealer],
+    [user, sessionDealer, refreshSessionDealer],
   );
 
   const mergeListings = useCallback(
     async (incoming: ListingInput[]) => {
-      if (!user) return "Debes iniciar sesión.";
+      if (!user || !sessionDealer) return "Debes iniciar sesión.";
       try {
-        await mergeDealerListings(user.id, incoming);
+        await mergeDealerListings(sessionDealer.id, incoming);
         await refreshSessionDealer();
         return null;
       } catch (e) {
         return e instanceof Error ? e.message : "Error al subir catálogo.";
       }
     },
-    [user, refreshSessionDealer],
+    [user, sessionDealer, refreshSessionDealer],
   );
 
   const clearListings = useCallback(async () => {
-    if (!user) return "Debes iniciar sesión.";
+    if (!user || !sessionDealer) return "Debes iniciar sesión.";
     try {
-      await replaceDealerListings(user.id, []);
+      await replaceDealerListings(sessionDealer.id, []);
       await refreshSessionDealer();
       return null;
     } catch (e) {
       return e instanceof Error ? e.message : "Error al vaciar.";
     }
-  }, [user, refreshSessionDealer]);
+  }, [user, sessionDealer, refreshSessionDealer]);
+
+  const isAdmin = isAdminUser(user);
 
   const value = useMemo<Ctx>(
     () => ({
       configured: supabaseConfigured,
       loading,
       user,
+      isAdmin,
       sessionDealer,
       sessionListings,
       refreshSessionDealer,
@@ -257,6 +263,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [
       loading,
       user,
+      isAdmin,
       sessionDealer,
       sessionListings,
       refreshSessionDealer,

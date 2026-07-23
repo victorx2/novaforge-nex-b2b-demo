@@ -1,10 +1,16 @@
 import type {
+  DealerImportRow,
   DealerProfile,
+  ListingImportByDealer,
   ListingInput,
   ListingRow,
   SearchHit,
 } from "@buscarepuesto/shared";
-import { listingMatchesQuery, sortHitsByState } from "@buscarepuesto/shared";
+import {
+  dealerMatchKey,
+  normalizePhoneKey,
+  sortHitsByState,
+} from "@buscarepuesto/shared";
 import { requireSupabase } from "./supabase";
 
 type ListingJoin = ListingRow & {
@@ -14,6 +20,7 @@ type ListingJoin = ListingRow & {
 function mapDealer(row: DealerProfile): DealerProfile {
   return {
     id: row.id,
+    user_id: row.user_id ?? null,
     business_name: row.business_name,
     phone: row.phone,
     address: row.address,
@@ -28,7 +35,7 @@ function unwrapDealer(
   d: DealerProfile | DealerProfile[] | null,
 ): DealerProfile | null {
   if (!d) return null;
-  return Array.isArray(d) ? d[0] ?? null : d;
+  return Array.isArray(d) ? (d[0] ?? null) : d;
 }
 
 export async function fetchAllDealers(): Promise<DealerProfile[]> {
@@ -47,6 +54,19 @@ export async function fetchDealer(id: string): Promise<DealerProfile | null> {
     .from("dealers")
     .select("*")
     .eq("id", id)
+    .maybeSingle();
+  if (error) throw error;
+  return data ? mapDealer(data) : null;
+}
+
+export async function fetchDealerByUserId(
+  userId: string,
+): Promise<DealerProfile | null> {
+  const sb = requireSupabase();
+  const { data, error } = await sb
+    .from("dealers")
+    .select("*")
+    .eq("user_id", userId)
     .maybeSingle();
   if (error) throw error;
   return data ? mapDealer(data) : null;
@@ -84,19 +104,25 @@ export async function searchListings(
   const q = query.trim();
   if (!q) return [];
 
-  const { data, error } = await sb
+  // Evitar romper el parser PostgREST (.or) con comas/paréntesis
+  const safe = q.replace(/[,()]/g, " ").trim();
+  if (!safe) return [];
+  const pattern = `%${safe}%`;
+  let req = sb
     .from("listings")
-    .select("*, dealers(*)")
-    .limit(500);
-  if (error) throw error;
+    .select("*, dealers!inner(*)")
+    .or(
+      `part_number.ilike."${pattern}",name.ilike."${pattern}",brand.ilike."${pattern}",model.ilike."${pattern}"`,
+    )
+    .limit(200);
 
-  let hits = toHits((data ?? []) as ListingJoin[]).filter((h) =>
-    listingMatchesQuery(h.listing, q),
-  );
   if (stateFilter) {
-    hits = hits.filter((h) => h.dealer.state === stateFilter);
+    req = req.eq("dealers.state", stateFilter);
   }
-  return sortHitsByState(hits);
+
+  const { data, error } = await req;
+  if (error) throw error;
+  return sortHitsByState(toHits((data ?? []) as ListingJoin[]));
 }
 
 export async function fetchDirectoryStats(): Promise<{
@@ -162,23 +188,45 @@ function toHits(rows: ListingJoin[]): SearchHit[] {
   return hits;
 }
 
-export async function upsertDealerProfile(
-  profile: Omit<DealerProfile, "created_at" | "updated_at">,
-): Promise<void> {
+/** Crea o actualiza el perfil del usuario autenticado (self-serve). */
+export async function ensureDealerForUser(
+  userId: string,
+  profile: Omit<DealerProfile, "id" | "created_at" | "updated_at" | "user_id">,
+): Promise<DealerProfile> {
+  const existing = await fetchDealerByUserId(userId);
   const sb = requireSupabase();
-  const { error } = await sb.from("dealers").upsert({
-    id: profile.id,
-    business_name: profile.business_name,
-    phone: profile.phone,
-    address: profile.address,
-    state: profile.state,
-    city: profile.city,
-  });
+  if (existing) {
+    const { error } = await sb
+      .from("dealers")
+      .update({
+        business_name: profile.business_name,
+        phone: profile.phone,
+        address: profile.address,
+        state: profile.state,
+        city: profile.city,
+      })
+      .eq("id", existing.id);
+    if (error) throw error;
+    return (await fetchDealer(existing.id))!;
+  }
+  const { data, error } = await sb
+    .from("dealers")
+    .insert({
+      user_id: userId,
+      business_name: profile.business_name,
+      phone: profile.phone,
+      address: profile.address,
+      state: profile.state,
+      city: profile.city,
+    })
+    .select("*")
+    .single();
   if (error) throw error;
+  return mapDealer(data);
 }
 
 export async function updateDealerProfile(
-  id: string,
+  dealerId: string,
   patch: Partial<
     Pick<
       DealerProfile,
@@ -187,7 +235,7 @@ export async function updateDealerProfile(
   >,
 ): Promise<void> {
   const sb = requireSupabase();
-  const { error } = await sb.from("dealers").update(patch).eq("id", id);
+  const { error } = await sb.from("dealers").update(patch).eq("id", dealerId);
   if (error) throw error;
 }
 
@@ -226,4 +274,107 @@ export async function mergeDealerListings(
   for (const l of current) map.set(keyOf(l), l);
   for (const l of incoming) map.set(keyOf(l), l);
   await replaceDealerListings(dealerId, Array.from(map.values()));
+}
+
+/** Operador: upsert locales por teléfono (sin cuenta auth). */
+export async function adminUpsertDealers(
+  rows: DealerImportRow[],
+): Promise<{ created: number; updated: number }> {
+  const sb = requireSupabase();
+  const existing = await fetchAllDealers();
+  const byKey = new Map<string, DealerProfile>();
+  for (const d of existing) {
+    const k = dealerMatchKey({ phone: d.phone, business_name: d.business_name });
+    if (k) byKey.set(k, d);
+  }
+
+  let created = 0;
+  let updated = 0;
+  for (const row of rows) {
+    const key = dealerMatchKey(row);
+    if (!key) continue;
+    const hit = byKey.get(key);
+    if (hit) {
+      const { error } = await sb
+        .from("dealers")
+        .update({
+          business_name: row.business_name,
+          phone: row.phone,
+          address: row.address,
+          state: row.state,
+          city: row.city || hit.city,
+        })
+        .eq("id", hit.id);
+      if (error) throw error;
+      updated++;
+      byKey.set(key, { ...hit, ...row });
+    } else {
+      const { data, error } = await sb
+        .from("dealers")
+        .insert({
+          business_name: row.business_name,
+          phone: row.phone,
+          address: row.address,
+          state: row.state,
+          city: row.city || row.state,
+          user_id: null,
+        })
+        .select("*")
+        .single();
+      if (error) throw error;
+      created++;
+      byKey.set(key, mapDealer(data));
+    }
+  }
+  return { created, updated };
+}
+
+/** Operador: merge catálogo enlazando por teléfono o nombre. */
+export async function adminMergeListingsByDealer(
+  rows: ListingImportByDealer[],
+): Promise<{ dealersTouched: number; itemsMerged: number; skipped: number }> {
+  const existing = await fetchAllDealers();
+  const byKey = new Map<string, DealerProfile>();
+  for (const d of existing) {
+    const pk = normalizePhoneKey(d.phone);
+    if (pk) byKey.set(`p:${pk}`, d);
+    const nk = d.business_name.trim().toLowerCase();
+    if (nk) byKey.set(`n:${nk}`, d);
+  }
+
+  const grouped = new Map<string, ListingInput[]>();
+  let skipped = 0;
+  for (const row of rows) {
+    const key = dealerMatchKey(row);
+    const dealer = key ? byKey.get(key) : undefined;
+    if (!dealer) {
+      skipped++;
+      continue;
+    }
+    const list = grouped.get(dealer.id) ?? [];
+    list.push({
+      part_number: row.part_number,
+      name: row.name,
+      brand: row.brand,
+      model: row.model,
+      observation: row.observation,
+    });
+    grouped.set(dealer.id, list);
+  }
+
+  let itemsMerged = 0;
+  for (const [dealerId, items] of grouped) {
+    await mergeDealerListings(dealerId, items);
+    itemsMerged += items.length;
+  }
+
+  return {
+    dealersTouched: grouped.size,
+    itemsMerged,
+    skipped,
+  };
+}
+
+export async function adminClearDealerListings(dealerId: string): Promise<void> {
+  await replaceDealerListings(dealerId, []);
 }

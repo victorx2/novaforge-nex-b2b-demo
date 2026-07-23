@@ -111,10 +111,11 @@ export function Repuestero() {
     return (
       <section className="dealer-auth">
         <header className="panel-head">
-          <h2>Cargar catálogo de rodamientos</h2>
+          <h2>Cargar catálogo automotriz</h2>
           <p>
             Regístrate gratis con email, sube tu CSV y cuando alguien busque un
-            código, te aparece con teléfono y dirección. Sin membresía.
+            código, te aparece con teléfono y dirección.{" "}
+            <strong>100% gratis · sin membresía</strong>.
           </p>
         </header>
 
@@ -143,10 +144,6 @@ export function Repuestero() {
 
         {mode === "login" ? (
           <form className="auth-form" onSubmit={onLogin}>
-            <p className="hint">
-              Demo seed: <strong>valencia@demo.local</strong> /{" "}
-              <strong>demo1234</strong>
-            </p>
             <label className="field">
               <span>Email</span>
               <input
@@ -330,7 +327,7 @@ export function Repuestero() {
       </section>
 
       <header className="panel-head">
-        <h2>Mi catálogo de rodamientos</h2>
+        <h2>Mi catálogo de repuestos</h2>
         <p>
           Sube CSV: código, nombre, marca, modelo, observación. Queda en la base
           compartida en la nube.
@@ -387,7 +384,7 @@ export function Repuestero() {
 
       {sessionListings.length === 0 ? (
         <div className="empty">
-          Aún no tienes rodamientos en el catálogo. Sube el CSV o descarga la
+          Aún no tienes repuestos en el catálogo. Sube el CSV o descarga la
           plantilla.
         </div>
       ) : (

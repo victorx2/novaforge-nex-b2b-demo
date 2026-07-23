@@ -1,31 +1,47 @@
-# BuscaRepuesto (programa real)
+# BuscaRepuesto (programa — nicho automotriz)
 
-Directorio multi-local de rodamientos: busca código → locales con teléfono y dirección. Repuestero se registra gratis y sube CSV. Sin precios ni membresía.
+Directorio multi-local de **repuestos automotrices**: busca código → locales con teléfono / WhatsApp. **100% gratis · sin membresía.** El activo es la base de datos (`dealers` + `listings`).
+
+> No es un directorio de rodamientos industriales.
 
 ## Monorepo
 
 ```text
 apps/web              # Vite + React (UI)
 packages/shared       # tipos, CSV, estados, búsqueda
-supabase/             # migraciones + seed
+supabase/             # migraciones + seed (solo dev)
 ```
 
-## Setup Supabase (obligatorio)
+## Setup Supabase
 
 1. Crea un proyecto en https://supabase.com
-2. SQL Editor → pega y ejecuta `supabase/migrations/001_init.sql`
-3. Luego ejecuta `supabase/seed.sql` (6 locales demo)
-4. En Authentication → Providers → Email: activa email (puedes desactivar “Confirm email” para demos)
-5. Copia URL y anon key → `apps/web/.env`:
+2. SQL Editor → ejecuta en orden:
+   - `supabase/migrations/001_init.sql`
+   - `supabase/migrations/002_dealers_user_id_admin.sql`
+3. (Opcional, solo entornos vacíos) `supabase/seed.sql`
+4. Authentication → Email: activa; para operar rápido, desactiva “Confirm email”
+5. Copia URL y **anon** key → `apps/web/.env`:
 
 ```bash
 cp apps/web/.env.example apps/web/.env
-# edita VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY
+# VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY
 ```
 
-6. En Vercel: mismas variables de entorno.
+6. Vercel: mismas variables (Production + Preview) y redeploy.
 
-Login seed: `valencia@demo.local` / `demo1234`
+### Rol operador (obligatorio para llenar BD)
+
+1. Crea tu usuario (registro normal o Auth → Users → Invite/Add).
+2. Authentication → Users → tu usuario → **Raw App Meta Data**:
+
+```json
+{"role":"admin"}
+```
+
+3. Abre la app en `#operador` (ej. `https://tu-dominio/#operador`), entra con ese email/clave.
+4. Importa CSV de **locales** y luego de **catálogo** (Excel → Guardar como CSV).
+
+Plantillas en la pantalla Operador.
 
 ## Local
 
@@ -34,13 +50,19 @@ npm install
 npm run dev
 ```
 
-Build: `npm run build` · servir: `npm start` o `Iniciar_Demo.bat`
+Build: `npm run build`
 
 ## Flujo
 
 | Pantalla | Función |
 |----------|---------|
-| **Buscar** | Código + estado → resultados → catálogo del local |
-| **Soy repuestero** | Auth email, perfil, subir catálogo CSV (5 columnas) |
+| **Buscar** | Código + estado → Llamar / WhatsApp → catálogo del local |
+| **Soy repuestero** | Registro gratis + CSV (canal secundario) |
+| **Operador** (`#operador`) | Tú llenas la BD a granel (admin) |
 
-Portafolio UI antiguo: `/portfolio` tras el build.
+## Smoke checklist
+
+1. Migración `002` aplicada y `role: admin` en tu user.
+2. Operador: importar 1 local + códigos → stats suben.
+3. Buscar un código → Llamar / WhatsApp abren.
+4. Redeploy Vercel tras cambios de código (env Vite se hornea en build).

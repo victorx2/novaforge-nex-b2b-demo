@@ -49,7 +49,7 @@ export function DirectoryStats() {
 
   const cells = [
     { value: formatEsNumber(stats.dealers), label: "Locales registrados" },
-    { value: formatEsNumber(stats.listings), label: "Rodamientos listados" },
+    { value: formatEsNumber(stats.listings), label: "Repuestos listados" },
     { value: formatEsNumber(stats.codes), label: "Códigos distintos" },
     {
       value: formatRelativeUpdate(stats.lastUpdatedMs),

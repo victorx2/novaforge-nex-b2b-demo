@@ -1,10 +1,11 @@
 import { useState } from "react";
 import type { SearchHit } from "@buscarepuesto/shared";
 import { STATES } from "@buscarepuesto/shared";
-import { BearingVisual } from "../components/BearingVisual";
+import { ContactActions } from "../components/ContactActions";
 import { DealerCatalog } from "../components/DealerCatalog";
 import { DirectoryStats } from "../components/DirectoryStats";
 import { LatestListings } from "../components/LatestListings";
+import { PartVisual } from "../components/PartVisual";
 import { SetupBanner } from "../components/SetupBanner";
 import { searchListings } from "../lib/api";
 import { useAuth } from "../lib/AuthContext";
@@ -66,11 +67,11 @@ export function Buscar() {
       {!configured && <SetupBanner />}
 
       <div className="search-hero">
-        <h1>¿Qué rodamiento buscas?</h1>
+        <h1>¿Qué repuesto buscas?</h1>
         <p>
-          Escribe el código. Te mostramos en qué locales lo tienen. Toca un
-          local para ver <strong>todo su catálogo de rodamientos</strong>. El
-          precio lo cuadran por teléfono.
+          Escribe el código o nombre. Te mostramos en qué locales lo tienen.{" "}
+          <strong>100% gratis · sin membresía</strong>. El precio lo cuadran por
+          teléfono o WhatsApp. Nicho: <strong>automotriz</strong>.
         </p>
 
         <form
@@ -84,7 +85,7 @@ export function Buscar() {
             className="search-input"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Ej. 6205-2RS o 25x52x15"
+            placeholder="Ej. FILTRO-ACEITE o pastilla freno"
             autoFocus
             disabled={!configured}
           />
@@ -113,17 +114,17 @@ export function Buscar() {
             <button
               type="button"
               className="linkish"
-              onClick={() => void runSearch("6205", "")}
+              onClick={() => void runSearch("filtro", "")}
             >
-              6205
+              filtro
             </button>{" "}
             en todo el país, o{" "}
             <button
               type="button"
               className="linkish"
-              onClick={() => void runSearch("6205", "Carabobo")}
+              onClick={() => void runSearch("bujia", "Carabobo")}
             >
-              6205 en Carabobo
+              bujía en Carabobo
             </button>
           </p>
         )}
@@ -180,7 +181,7 @@ export function Buscar() {
                   openDealer(hit.dealer.id, hit.listing.part_number)
                 }
               >
-                <BearingVisual
+                <PartVisual
                   partNumber={hit.listing.part_number}
                   brand={hit.listing.brand}
                 />
@@ -200,12 +201,12 @@ export function Buscar() {
                   <div className="catalog-cta">Ver catálogo del local →</div>
                 </div>
               </button>
-              <a
-                className="hit-phone hit-phone-bar"
-                href={`tel:${hit.dealer.phone}`}
-              >
-                Llamar {hit.dealer.phone}
-              </a>
+              <ContactActions
+                className="hit-contact-bar"
+                phone={hit.dealer.phone}
+                businessName={hit.dealer.business_name}
+                partNumber={hit.listing.part_number}
+              />
             </article>
           ))}
         </div>

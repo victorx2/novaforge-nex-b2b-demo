@@ -1,6 +1,6 @@
 import type { ListingRow, SearchHit } from "./types";
 
-/** Coincide código, nombre, marca o modelo (ej. 6205 o 25x52x15). */
+/** Coincide código, nombre, marca o modelo (ej. filtro o bujia). */
 export function listingMatchesQuery(
   listing: Pick<
     ListingRow,

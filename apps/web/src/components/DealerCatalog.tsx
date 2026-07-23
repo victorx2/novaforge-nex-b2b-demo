@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import type { DealerProfile, ListingRow } from "@buscarepuesto/shared";
 import { fetchDealer, fetchDealerListings } from "../lib/api";
-import { BearingVisual } from "./BearingVisual";
+import { ContactActions } from "./ContactActions";
+import { PartVisual } from "./PartVisual";
 
 type Props = {
   dealerId: string;
@@ -66,12 +67,15 @@ export function DealerCatalog({ dealerId, highlightCode, onBack }: Props) {
           <strong>{dealer.state}</strong> · {dealer.city}
         </p>
         <p className="catalog-address">{dealer.address}</p>
-        <a className="hit-phone catalog-phone" href={`tel:${dealer.phone}`}>
-          {dealer.phone}
-        </a>
+        <ContactActions
+          className="catalog-contact"
+          phone={dealer.phone}
+          businessName={dealer.business_name}
+          partNumber={highlightCode}
+        />
         <p className="muted">
-          Catálogo de rodamientos · {listings.length} ítem
-          {listings.length === 1 ? "" : "s"} · sin precios
+          Catálogo automotriz · {listings.length} ítem
+          {listings.length === 1 ? "" : "s"} · sin precios · gratis
         </p>
       </header>
 
@@ -88,7 +92,7 @@ export function DealerCatalog({ dealerId, highlightCode, onBack }: Props) {
                 className={`latest-card latest-card-static${isHit ? " catalog-hit" : ""}`}
                 key={item.id}
               >
-                <BearingVisual
+                <PartVisual
                   partNumber={item.part_number}
                   brand={item.brand}
                 />

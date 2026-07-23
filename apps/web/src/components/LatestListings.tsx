@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import type { SearchHit } from "@buscarepuesto/shared";
 import { fetchLatestListings } from "../lib/api";
 import { supabaseConfigured } from "../lib/supabase";
-import { BearingVisual } from "./BearingVisual";
+import { PartVisual } from "./PartVisual";
 
 type Props = {
   onOpenDealer: (dealerId: string, code?: string) => void;
@@ -35,7 +35,7 @@ export function LatestListings({ onOpenDealer }: Props) {
       <section className="latest-section">
         <header className="latest-head">
           <h2>Últimos listados</h2>
-          <p>Aún no hay rodamientos cargados en la base.</p>
+          <p>Aún no hay repuestos cargados en la base.</p>
         </header>
       </section>
     );
@@ -46,7 +46,7 @@ export function LatestListings({ onOpenDealer }: Props) {
       <header className="latest-head">
         <h2>Últimos listados</h2>
         <p>
-          Rodamientos recién cargados. Toca una tarjeta para ver el{" "}
+          Piezas automotrices recién cargadas. Toca una tarjeta para ver el{" "}
           <strong>catálogo completo</strong> de ese local.
         </p>
       </header>
@@ -61,7 +61,7 @@ export function LatestListings({ onOpenDealer }: Props) {
               onOpenDealer(hit.dealer.id, hit.listing.part_number)
             }
           >
-            <BearingVisual
+            <PartVisual
               partNumber={hit.listing.part_number}
               brand={hit.listing.brand}
             />

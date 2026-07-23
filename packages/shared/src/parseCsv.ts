@@ -109,7 +109,7 @@ function splitCsvLine(line: string): string[] {
 }
 
 export const CSV_TEMPLATE = `codigo,nombre,marca,modelo,observacion
-6205-2RS,Rodamiento rigido de bolas,SKF,25x52x15,Nuevo
-6204-2RS,Rodamiento rigido de bolas,NTN,20x47x14,Nuevo
-6008-ZZ,Rodamiento rigido de bolas ZZ,FAG,40x68x15,Usado en perfectas condiciones
+FILTRO-ACEITE-WIX51515,Filtro de aceite,WIX,Sedan 1.6,Nuevo
+PASTILLA-FREN-D1060,Pastillas de freno delanteras,Bendix,Compacto,Nuevo
+BUJIA-NGK-BKR6E,Bujia iridium,NGK,4 cil,Usado en perfectas condiciones
 `;

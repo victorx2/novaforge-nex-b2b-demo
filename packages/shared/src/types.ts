@@ -27,6 +27,20 @@ export type SearchHit = {
 };
 
 export type DealerProfile = DealerPublic & {
+  user_id?: string | null;
   created_at?: string;
   updated_at?: string;
+};
+
+export type DealerImportRow = {
+  business_name: string;
+  phone: string;
+  address: string;
+  state: string;
+  city: string;
+};
+
+export type ListingImportByDealer = ListingInput & {
+  phone: string;
+  business_name: string;
 };

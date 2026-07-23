@@ -1,12 +1,38 @@
-import { useState } from "react";
-import { AuthProvider } from "./lib/AuthContext";
+import { useEffect, useState } from "react";
+import { AuthProvider, useAuth } from "./lib/AuthContext";
 import { Buscar } from "./pages/Buscar";
+import { Operador } from "./pages/Operador";
 import { Repuestero } from "./pages/Repuestero";
 
-type Page = "buscar" | "repuestero";
+type Page = "buscar" | "repuestero" | "operador";
 
 function Shell() {
-  const [page, setPage] = useState<Page>("buscar");
+  const { isAdmin } = useAuth();
+  const [page, setPage] = useState<Page>(() =>
+    typeof window !== "undefined" && window.location.hash === "#operador"
+      ? "operador"
+      : "buscar",
+  );
+
+  useEffect(() => {
+    const onHash = () => {
+      if (window.location.hash === "#operador") setPage("operador");
+    };
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
+  useEffect(() => {
+    if (page === "operador") {
+      if (window.location.hash !== "#operador") {
+        window.location.hash = "operador";
+      }
+    } else if (window.location.hash === "#operador") {
+      history.replaceState(null, "", window.location.pathname);
+    }
+  }, [page]);
+
+  const showOperadorTab = isAdmin || page === "operador";
 
   return (
     <div className="app">
@@ -19,7 +45,7 @@ function Shell() {
             <div className="brand-text">
               <div className="brand-name">BuscaRepuesto</div>
               <div className="brand-tagline">
-                Rodamientos · encuentra y llama al local
+                Automotriz · 100% gratis · llama al local
               </div>
             </div>
           </div>
@@ -41,13 +67,28 @@ function Shell() {
             onClick={() => setPage("repuestero")}
           >
             Soy repuestero
-            <span className="tab-sub"> · catálogo</span>
+            <span className="tab-sub"> · gratis</span>
           </button>
+          {showOperadorTab && (
+            <button
+              type="button"
+              className={page === "operador" ? "tab active" : "tab"}
+              onClick={() => setPage("operador")}
+            >
+              Operador
+            </button>
+          )}
         </div>
       </nav>
 
       <main className="main">
-        {page === "buscar" ? <Buscar /> : <Repuestero />}
+        {page === "buscar" ? (
+          <Buscar />
+        ) : page === "repuestero" ? (
+          <Repuestero />
+        ) : (
+          <Operador />
+        )}
       </main>
     </div>
   );

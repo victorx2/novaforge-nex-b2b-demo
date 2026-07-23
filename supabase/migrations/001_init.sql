@@ -1,6 +1,8 @@
 -- BuscaRepuesto: dealers + listings + RLS
 create extension if not exists "pgcrypto";
 
+-- Nota: en proyectos nuevos preferir 001 + 002 juntos.
+-- 001 histórico: id = auth.users. 002 desacopla y agrega user_id.
 create table if not exists public.dealers (
   id uuid primary key references auth.users (id) on delete cascade,
   business_name text not null,
