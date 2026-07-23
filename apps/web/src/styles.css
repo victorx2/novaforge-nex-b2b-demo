@@ -586,11 +586,6 @@ select {
   overflow-wrap: anywhere;
 }
 
-.latest-name {
-  font-weight: 600;
-  font-size: 0.92rem;
-}
-
 .hit-code {
   font-weight: 700;
   color: var(--accent);
