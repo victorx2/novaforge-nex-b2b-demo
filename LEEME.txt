@@ -1,5 +1,6 @@
 ========================================
-  NEX FASE A — Buscar + Mi stock
+  BuscaRepuesto / Repuestia
+  Directorio de repuestos automotrices
 ========================================
 
 REQUISITO: Node.js LTS (https://nodejs.org)
@@ -8,11 +9,9 @@ PASOS:
   1. Doble clic en Iniciar_Demo.bat
      o: npm install && npm run build && npm start
   2. Abrir http://localhost:3000
-  3. Pedir la contrasena al autor (misma del portafolio)
+  3. Configura apps/web/.env con Supabase (ver README)
 
-PORTAFOLIO COMPLETO (maqueta ecosistema):
-  http://localhost:3000/portfolio/
-
-NOTA: Datos ficticios. robots.txt bloquea indexacion.
+NOTA: 100% gratis · sin membresía · nicho automotriz.
+      robots.txt bloquea indexacion.
 
 ========================================

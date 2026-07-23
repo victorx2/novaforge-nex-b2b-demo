@@ -1,4 +1,4 @@
-# BuscaRepuesto (programa — nicho automotriz)
+# Repuestia (BuscaRepuesto — nicho automotriz)
 
 Directorio multi-local de **repuestos automotrices**: busca código → locales con teléfono / WhatsApp. **100% gratis · sin membresía.** El activo es la base de datos (`dealers` + `listings`).
 

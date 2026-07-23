@@ -1,11 +1,11 @@
 @echo off
 chcp 65001 >nul
-title BuscaRepuesto
+title Repuestia
 cd /d "%~dp0"
 
 echo.
 echo  ========================================
-echo   BuscaRepuesto — directorio real
+echo   Repuestia — directorio automotriz
 echo  ========================================
 echo.
 

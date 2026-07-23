@@ -1,5 +1,5 @@
 {
-  "name": "buscarepuesto",
+  "name": "repuestia",
   "private": true,
   "workspaces": [
     "apps/*",

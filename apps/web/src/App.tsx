@@ -40,10 +40,10 @@ function Shell() {
         <div className="site-header-inner">
           <div className="brand-block">
             <div className="brand-logo" aria-hidden>
-              <span>B</span>
+              <span>R</span>
             </div>
             <div className="brand-text">
-              <div className="brand-name">BuscaRepuesto</div>
+              <div className="brand-name">Repuestia</div>
               <div className="brand-tagline">
                 Automotriz · 100% gratis · llama al local
               </div>

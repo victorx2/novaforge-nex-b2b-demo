@@ -3,9 +3,8 @@
   "buildCommand": "npm run build -w @buscarepuesto/web",
   "outputDirectory": "apps/web/dist",
   "rewrites": [
-    { "source": "/portfolio", "destination": "/portfolio/index.html" },
     {
-      "source": "/((?!robots\\.txt|portfolio(?:/|$)|assets/).*)",
+      "source": "/((?!robots\\.txt|assets/).*)",
       "destination": "/index.html"
     }
   ],
