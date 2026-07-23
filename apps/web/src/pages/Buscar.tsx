@@ -71,42 +71,44 @@ export function Buscar() {
         <p>
           Escribe el código o nombre. Te mostramos en qué locales lo tienen.{" "}
           <strong>100% gratis · sin membresía</strong>. El precio lo cuadran por
-          teléfono o WhatsApp. Nicho: <strong>automotriz</strong>.
+          teléfono o WhatsApp.
         </p>
 
-        <form
-          className="search-form"
-          onSubmit={(e) => {
-            e.preventDefault();
-            void runSearch(query, stateFilter);
-          }}
-        >
-          <input
-            className="search-input"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Ej. FILTRO-ACEITE o pastilla freno"
-            autoFocus
-            disabled={!configured}
-          />
-          <select
-            className="state-select"
-            value={stateFilter}
-            onChange={(e) => setStateFilter(e.target.value)}
-            aria-label="Filtrar por estado"
-            disabled={!configured}
+        <div className="search-shell">
+          <form
+            className="search-form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              void runSearch(query, stateFilter);
+            }}
           >
-            <option value="">Todo el país</option>
-            {STATES.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
-          <button type="submit" className="btn-primary" disabled={!configured}>
-            {searching ? "…" : "Buscar"}
-          </button>
-        </form>
+            <input
+              className="search-input"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Ej. FILTRO-ACEITE o pastilla freno"
+              autoFocus
+              disabled={!configured}
+            />
+            <select
+              className="state-select"
+              value={stateFilter}
+              onChange={(e) => setStateFilter(e.target.value)}
+              aria-label="Filtrar por estado"
+              disabled={!configured}
+            >
+              <option value="">Todo el país</option>
+              {STATES.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+            <button type="submit" className="btn-primary" disabled={!configured}>
+              {searching ? "…" : "Buscar"}
+            </button>
+          </form>
+        </div>
 
         {!submitted && configured && (
           <p className="hint">
